@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "servertweaks",
+  "version": "${mod_version}",
+  "name": "Useful & Fun Server Tweaks",
+  "description": "",
+  "authors": [
+    "JustMili"
+  ],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "net.justmili.servertweaks.ServerTweaks"
+    ]
+  },
+  "mixins": [
+    "servertweaks.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

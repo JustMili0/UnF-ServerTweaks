@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.justmili.servertweaks.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "NotTooExpensive"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
