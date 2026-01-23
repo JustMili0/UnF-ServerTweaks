@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.justmili.Util;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -15,7 +16,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
@@ -45,12 +45,11 @@ public class DamageToggle {
                     return true;
                 }
             );
-
         }
 
         dispatcher.register(
             Commands.literal("damagetoggle")
-                .requires(src -> src.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))
+                .requires(src -> Util.hasPerms(src, 4))
                 .then(Commands.argument("type", IdentifierArgument.id())
                     .suggests(DamageToggle::suggestDamageTypes)
                     .then(Commands.literal("true")
@@ -62,6 +61,7 @@ public class DamageToggle {
                 )
         );
     }
+    //Suggests damage types
     private static CompletableFuture<Suggestions> suggestDamageTypes(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
         Registry<DamageType> registry =
             ctx.getSource()
@@ -72,7 +72,7 @@ public class DamageToggle {
         String remaining = builder.getRemainingLowerCase();
 
         for (Identifier key : registry.keySet()) {
-            String id = key.toString(); // minecraft:fall
+            String id = key.toString();
             if (id.startsWith(remaining)) {
                 builder.suggest(id);
             }
@@ -81,6 +81,7 @@ public class DamageToggle {
         return builder.buildFuture();
     }
 
+    //Feedback
     private static int setDamage(CommandContext<CommandSourceStack> ctx, boolean disable) {
         Identifier id = IdentifierArgument.getId(ctx, "type");
 
@@ -91,7 +92,7 @@ public class DamageToggle {
                 .append(Component.literal(id.toString()).withStyle(ChatFormatting.AQUA))
                 .append(Component.literal("' is now "))
                 .append(Component.literal(disable ? "DISABLED" : "ENABLED")
-                    .withStyle(disable ? ChatFormatting.RED : ChatFormatting.GREEN, ChatFormatting.BOLD)),
+                    .withStyle(disable ? ChatFormatting.RED : ChatFormatting.GREEN)),
             true
         );
         return 1;

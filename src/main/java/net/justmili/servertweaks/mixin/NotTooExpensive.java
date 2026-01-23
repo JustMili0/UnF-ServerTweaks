@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AnvilMenu.class)
 public abstract class NotTooExpensive {
+    //Dev note: I was fed up
     @Shadow private DataSlot cost;
 
     @ModifyConstant(method = "createResult", constant = @Constant(intValue = 40))

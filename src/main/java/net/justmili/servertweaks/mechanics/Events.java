@@ -19,15 +19,20 @@ public final class Events {
         banishmentEvents();
     }
 
+    //             --All this is specifically for the banishment dimension
+    //Middle slot
     private static final int HOTBAR_SLOT = 4;
     public static void banishmentEvents() {
+        //Safeguard 1 - No damage, can't escape via death
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (!(entity instanceof ServerPlayer player)) return true;
             return player.level().dimension() != Dimensions.BANISHMENT_WORLD;
         });
+
         ServerTickEvents.END_WORLD_TICK.register((ServerLevel level) -> {
             if (level.dimension() != Dimensions.BANISHMENT_WORLD) return;
 
+            //Give torch so they can even see
             for (ServerPlayer player : level.players()) {
                 ItemStack stack = player.getInventory().getItem(HOTBAR_SLOT);
                 if (stack.isEmpty()) {
@@ -37,6 +42,7 @@ public final class Events {
                     );
                 }
 
+                //Safeguard 2 - Prevent falling into the deep void if the player breaks the bedrock somehow
                 if (player.getY() < -1.0) {
                     int centerX = player.blockPosition().getX();
                     int centerZ = player.blockPosition().getZ();
@@ -49,14 +55,14 @@ public final class Events {
                             }
                         }
                     }
-                    player.teleportTo(level, player.getX(), 3.0, player.getZ(), Set.of(), player.getYRot(), player.getXRot(), true
-                    );
-
+                    player.teleportTo(level, player.getX(), 3.0, player.getZ(), Set.of(), player.getYRot(), player.getXRot(), true);
                     player.setDeltaMovement(0.0, 0.0, 0.0);
                     player.fallDistance = 0.0F;
                 }
             }
         });
+
+        //Safeguard 3 - despawn all dropped torch item entities so player can't infinitely dupe them and overload the server
         ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
             if (level.dimension() != Dimensions.BANISHMENT_WORLD) return;
             if (entity instanceof ItemEntity item && item.getItem().is(Items.TORCH)) {

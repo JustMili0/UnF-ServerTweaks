@@ -1,5 +1,5 @@
 {
-  "type": "mcsm:banishment",
+  "type": "servertweaks:banishment",
   "generator": {
     "type": "minecraft:flat",
     "settings": {

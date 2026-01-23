@@ -2,14 +2,12 @@ package net.justmili.servertweaks.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
-import net.justmili.servertweaks.util.ScoreboardCheck;
+import net.justmili.servertweaks.util.ScalerUtil;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-
-import static net.justmili.servertweaks.util.ScaleApplier.applyScaleToPlayer;
 
 public class ScaleMe {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext, Commands.CommandSelection environment) {
@@ -24,15 +22,15 @@ public class ScaleMe {
                             return 0;
                         }
 
-                        if (ScoreboardCheck.isLocked(player)) {
+                        if (ScalerUtil.isLocked(player)) {
                             source.sendFailure(Component.literal("You can not change your height more than once."));
                             return 0;
                         }
 
                         double heightCm = DoubleArgumentType.getDouble(ctx, "heightInCm");
                         double scale = heightCm / 185.0;
-                        applyScaleToPlayer(player, scale);
-                        ScoreboardCheck.setLocked(player, true);
+                        ScalerUtil.applyScaleToPlayer(player, scale);
+                        ScalerUtil.setLocked(player, true);
 
                         source.sendSuccess(() -> Component.literal(String.format("Your irl-to-game scale is %.3f (%.1f cm). It is now locked.", scale, heightCm)), false);
                         return 1;
