@@ -4,7 +4,10 @@ import net.fabricmc.api.ModInitializer;
 import net.justmili.servertweaks.init.Commands;
 import net.justmili.servertweaks.init.Dimensions;
 import net.justmili.servertweaks.mechanics.Events;
-
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,5 +21,13 @@ public class ServerTweaks implements ModInitializer {
         Commands.register();
         Dimensions.register();
         Events.register();
+    }
+
+    public static Identifier asId(String path) {
+        return Identifier.parse(MODID+":"+path);
+    }
+    //Fuck the new permission system, bring back integers
+    public static boolean hasPerms(CommandSourceStack src, int level) {
+        return src.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(level)));
     }
 }

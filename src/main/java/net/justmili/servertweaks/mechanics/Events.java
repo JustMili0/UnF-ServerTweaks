@@ -3,7 +3,9 @@ package net.justmili.servertweaks.mechanics;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.justmili.servertweaks.init.Dimensions;
+import net.justmili.servertweaks.util.ScalerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,6 +19,7 @@ import java.util.Set;
 public final class Events {
     public static void register() {
         banishmentEvents();
+        convertScaler();
     }
 
     //             --All this is specifically for the banishment dimension
@@ -68,6 +71,14 @@ public final class Events {
             if (entity instanceof ItemEntity item && item.getItem().is(Items.TORCH)) {
                 entity.discard();
             }
+        });
+    }
+
+    //Temp convert method
+    private static void convertScaler() {
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayer player = handler.getPlayer();
+            ScalerUtil.convertScoreToVar(player);
         });
     }
 }

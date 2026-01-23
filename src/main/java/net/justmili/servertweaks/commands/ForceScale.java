@@ -2,7 +2,7 @@ package net.justmili.servertweaks.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
-import net.justmili.Util;
+import net.justmili.servertweaks.ServerTweaks;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -18,7 +18,7 @@ public class ForceScale {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext, Commands.CommandSelection environment) {
         dispatcher.register(
             Commands.literal("forcescale")
-                .requires(src -> Util.hasPerms(src, 4))
+                .requires(src -> ServerTweaks.hasPerms(src, 4))
                 .then(Commands.argument("player", EntityArgument.players())
                     .then(Commands.argument("heightInCm", DoubleArgumentType.doubleArg(18.5, 2960.0))
                         .executes(ctx -> {

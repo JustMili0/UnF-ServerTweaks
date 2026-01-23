@@ -5,7 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.justmili.Util;
+import net.justmili.servertweaks.ServerTweaks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -49,7 +49,7 @@ public class DamageToggle {
 
         dispatcher.register(
             Commands.literal("damagetoggle")
-                .requires(src -> Util.hasPerms(src, 4))
+                .requires(src -> ServerTweaks.hasPerms(src, 4))
                 .then(Commands.argument("type", IdentifierArgument.id())
                     .suggests(DamageToggle::suggestDamageTypes)
                     .then(Commands.literal("true")

@@ -1,7 +1,7 @@
 package net.justmili.servertweaks.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.justmili.Util;
+import net.justmili.servertweaks.ServerTweaks;
 import net.justmili.servertweaks.init.Dimensions;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -16,7 +16,7 @@ public class Banish {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext, Commands.CommandSelection environment) {
         dispatcher.register(
             Commands.literal("banish")
-                .requires(src -> Util.hasPerms(src, 4))
+                .requires(src -> ServerTweaks.hasPerms(src, 4))
                 .then(Commands.argument("player", EntityArgument.player())
                     .executes(ctx -> {
                         ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
