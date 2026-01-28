@@ -44,7 +44,6 @@ public class ScalerUtil {
     public static boolean isLocked(ServerPlayer player) {
         return Components.VARIABLES.get(player).isScaleLocked();
     }
-
     public static void setLocked(ServerPlayer player, boolean locked) {
         Variables vars = Components.VARIABLES.get(player);
         vars.setScaleLocked(locked);

@@ -1,7 +1,7 @@
 package net.justmili.servertweaks.network;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.ladysnake.cca.api.v3.component.Component;
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
 
@@ -17,12 +17,12 @@ public class Variables implements Component, AutoSyncedComponent {
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag, HolderLookup.Provider provider) {
-        scaleLocked = tag.getBoolean("isScaleLocked").orElse(false);
+    public void readData(ValueInput valueIn) {
+        scaleLocked = valueIn.getBooleanOr("isScaleLocked", false);
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag, HolderLookup.Provider provider) {
-        tag.putBoolean("isScaleLocked", scaleLocked);
+    public void writeData(ValueOutput valueOut) {
+        valueOut.putBoolean("isScaleLocked", scaleLocked);
     }
 }

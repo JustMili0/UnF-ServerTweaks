@@ -24,7 +24,10 @@ public class ServerTweaks implements ModInitializer {
     }
 
     public static Identifier asId(String path) {
-        return Identifier.parse(MODID+":"+path);
+        return Identifier.fromNamespaceAndPath(MODID, path);
+    }
+    public static Identifier asPath(String path) {
+        return Identifier.parse(path);
     }
     //Fuck the new permission system, bring back integers
     public static boolean hasPerms(CommandSourceStack src, int level) {
