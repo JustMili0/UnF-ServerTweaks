@@ -42,7 +42,12 @@ public class ScalerUtil {
 
     //For checking and locking the scale via variables
     public static boolean isLocked(ServerPlayer player) {
-        return Components.VARIABLES.get(player).isScaleLocked();
+        Variables vars = Components.VARIABLES.get(player);
+        if (vars == null) {
+            System.out.println("VARIABLES component is NULL for " + player.getName().getString());
+            return false;
+        }
+        return vars.isScaleLocked();
     }
     public static void setLocked(ServerPlayer player, boolean locked) {
         Variables vars = Components.VARIABLES.get(player);
