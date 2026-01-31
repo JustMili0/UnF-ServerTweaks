@@ -29,6 +29,7 @@ public class ScaleMe {
 
                         double heightCm = DoubleArgumentType.getDouble(ctx, "heightInCm");
                         double scale = heightCm / 185.0;
+                        ScalerUtil.createObjectiveIfMissing(player);
                         ScalerUtil.applyScaleToPlayer(player, scale);
                         ScalerUtil.setLocked(player, true);
 

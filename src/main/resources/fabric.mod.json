@@ -14,14 +14,6 @@
   "entrypoints": {
     "main": [
       "net.justmili.servertweaks.ServerTweaks"
-    ],
-    "entity_components": [
-      "net.justmili.servertweaks.network.EntityComponents"
-    ]
-  },
-  "custom": {
-    "cardinal-components": [
-      "servertweaks:variables"
     ]
   },
   "mixins": [

@@ -1,24 +1,26 @@
 package net.justmili.servertweaks.util;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.scores.*;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
 public class ScalerUtil {
     //Converts old scoreboard scuff to fresh variables
     private static final String OBJECTIVE = "scaleLocked";
 
 //    public static void convertScoreToVar(ServerPlayer player) {              //leftover method from trying to use CCAPI
-//        Scoreboard sb = player.level().getServer().getScoreboard();
-//        Objective obj = sb.getObjective(OBJECTIVE);
-//        if (obj == null) return;
+//        Scoreboard board = player.level().getServer().getScoreboard();
+//        Objective objective = board.getObjective(OBJECTIVE);
+//        if (objective == null) return;
 //
-//        ScoreAccess score = sb.getOrCreatePlayerScore(
-//            ScoreHolder.forNameOnly(player.getScoreboardName()),
-//            obj
+//        ScoreAccess score = board.getOrCreatePlayerScore(
+//            ScoreHolder.forNameOnly(player.getScoreboardName())
+//            objective
 //        );
 //
 //        if (score.get() > 0) {
@@ -50,11 +52,11 @@ public class ScalerUtil {
 
     //For checking and locking the scale via variables
     public static boolean isLocked(ServerPlayer player) {
-        Scoreboard sb = player.level().getServer().getScoreboard();
-        Objective obj = sb.getObjective(OBJECTIVE);
-        if (obj == null) return false;
+        Scoreboard board = player.level().getServer().getScoreboard();
+        Objective objective = board.getObjective(OBJECTIVE);
+        if (objective == null) return false;
 
-        ScoreAccess score = sb.getOrCreatePlayerScore(ScoreHolder.forNameOnly(player.getScoreboardName()), obj);
+        ScoreAccess score = board.getOrCreatePlayerScore(ScoreHolder.forNameOnly(player.getScoreboardName()), objective);
         return score.get() > 0;
     }
     public static boolean setLocked(ServerPlayer player, boolean locked) throws CommandSyntaxException {
@@ -67,5 +69,13 @@ public class ScalerUtil {
         String cmd = String.format("scoreboard players set %s %s %d", playerToken, OBJECTIVE, locked ? 1 : 0);
         int result = server.getCommands().getDispatcher().execute(cmd, server.createCommandSourceStack());
         return result >= 0;
+    }
+    
+    public static void createObjectiveIfMissing(ServerPlayer player) {
+        Scoreboard board = player.level().getServer().getScoreboard();
+        Objective objective = board.getObjective(OBJECTIVE);
+
+        if (objective == null)
+            board.addObjective(OBJECTIVE, ObjectiveCriteria.DUMMY, Component.empty(), ObjectiveCriteria.RenderType.INTEGER, false, null);
     }
 }

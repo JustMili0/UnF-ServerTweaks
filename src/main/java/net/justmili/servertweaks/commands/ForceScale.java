@@ -3,6 +3,7 @@ package net.justmili.servertweaks.commands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import net.justmili.servertweaks.ServerTweaks;
+import net.justmili.servertweaks.util.ScalerUtil;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -26,11 +27,14 @@ public class ForceScale {
                             double heightCm = DoubleArgumentType.getDouble(ctx, "heightInCm");
                             double scale = heightCm / 185.0;
 
-                            Collection<ServerPlayer> targets = EntityArgument.getPlayers(ctx, "player");
-                            for (ServerPlayer target : targets) { applyScaleToPlayer(target, scale); }
+                            Collection<ServerPlayer> players = EntityArgument.getPlayers(ctx, "player");
+                            for (ServerPlayer player : players) {
+                                ScalerUtil.createObjectiveIfMissing(player);
+                                applyScaleToPlayer(player, scale);
+                            }
 
-                            source.sendSuccess(() -> Component.literal(String.format("Applied scale %.3f (%.1f cm) to %d player(s).", scale, heightCm, targets.size())), false);
-                            return targets.size();
+                            source.sendSuccess(() -> Component.literal(String.format("Applied scale %.3f (%.1f cm) to %d player(s).", scale, heightCm, players.size())), false);
+                            return players.size();
                         })
                     )
                 )
