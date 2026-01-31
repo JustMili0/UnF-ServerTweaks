@@ -3,7 +3,7 @@ package net.justmili.servertweaks;
 import net.fabricmc.api.ModInitializer;
 import net.justmili.servertweaks.init.Commands;
 import net.justmili.servertweaks.init.Dimensions;
-import net.justmili.servertweaks.mechanics.Events;
+import net.justmili.servertweaks.init.Events;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.permissions.Permission;
