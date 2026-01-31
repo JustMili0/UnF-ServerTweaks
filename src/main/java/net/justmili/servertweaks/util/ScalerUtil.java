@@ -1,34 +1,33 @@
 package net.justmili.servertweaks.util;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
+import net.justmili.servertweaks.fdaapi.DataAttachments;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.scores.*;
-import net.minecraft.world.scores.criteria.ObjectiveCriteria;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.ScoreAccess;
+import net.minecraft.world.scores.ScoreHolder;
+import net.minecraft.world.scores.Scoreboard;
 
 public class ScalerUtil {
-    //Converts old scoreboard scuff to fresh variables
-    private static final String OBJECTIVE = "scaleLocked";
 
-//    public static void convertScoreToVar(ServerPlayer player) {              //leftover method from trying to use CCAPI
-//        Scoreboard board = player.level().getServer().getScoreboard();
-//        Objective objective = board.getObjective(OBJECTIVE);
-//        if (objective == null) return;
-//
-//        ScoreAccess score = board.getOrCreatePlayerScore(
-//            ScoreHolder.forNameOnly(player.getScoreboardName())
-//            objective
-//        );
-//
-//        if (score.get() > 0) {
-//            Variables vars = Components.VARIABLES.get(player);
-//            vars.setScaleLocked(true);
-//            Components.VARIABLES.sync(player);
-//        }
-//    }
+    //Converts old scoreboard scuff to fresh variables (purely for my own Minecraft server)
+    public static void convertScoreToVar(ServerPlayer player) {
+        if (Boolean.TRUE.equals(player.getAttached(DataAttachments.SCALE_LOCKED))) return;
+
+        Scoreboard board = player.level().getServer().getScoreboard();
+        Objective objective = board.getObjective("scaleLocked");
+        if (objective == null) return;
+
+        ScoreHolder holder = ScoreHolder.forNameOnly(player.getScoreboardName());
+        ScoreAccess score = board.getOrCreatePlayerScore(holder, objective);
+
+        // Migrate value
+        if (score.get() > 0) {
+            player.setAttached(DataAttachments.SCALE_LOCKED, true);
+            board.resetSinglePlayerScore(holder, objective);
+        }
+    }
 
     //Applies calculated scale
     public static void applyScaleToPlayer(ServerPlayer player, double scale) {
@@ -37,45 +36,18 @@ public class ScalerUtil {
         if (Double.isNaN(scale) || scale <= 0.0) scale = 1.0;
         scale = Math.max(min, Math.min(max, scale));
 
-        AttributeInstance instance;
-        try {
-            instance = player.getAttribute(Attributes.SCALE);
-        } catch (NoSuchFieldError | NoSuchMethodError e) {
-            instance = null;
-        }
-
+        AttributeInstance instance = player.getAttribute(Attributes.SCALE);
         if (instance != null) {
             instance.setBaseValue(scale);
             player.refreshDimensions();
         }
     }
 
-    //For checking and locking the scale via variables
+    //For checking and locking the scale via variables (Fabric Data Attachment API)
     public static boolean isLocked(ServerPlayer player) {
-        Scoreboard board = player.level().getServer().getScoreboard();
-        Objective objective = board.getObjective(OBJECTIVE);
-        if (objective == null) return false;
-
-        ScoreAccess score = board.getOrCreatePlayerScore(ScoreHolder.forNameOnly(player.getScoreboardName()), objective);
-        return score.get() > 0;
+        return Boolean.TRUE.equals(player.getAttached(DataAttachments.SCALE_LOCKED));
     }
-    public static boolean setLocked(ServerPlayer player, boolean locked) throws CommandSyntaxException {
-        MinecraftServer server = player.level().getServer();
-
-        String playerName = player.getScoreboardName();
-        boolean needsQuotes = playerName.contains(" ") || playerName.contains("\"");
-        String playerToken = needsQuotes ? ("\"" + playerName.replace("\"", "\\\"") + "\"") : playerName;
-
-        String cmd = String.format("scoreboard players set %s %s %d", playerToken, OBJECTIVE, locked ? 1 : 0);
-        int result = server.getCommands().getDispatcher().execute(cmd, server.createCommandSourceStack());
-        return result >= 0;
-    }
-    
-    public static void createObjectiveIfMissing(ServerPlayer player) {
-        Scoreboard board = player.level().getServer().getScoreboard();
-        Objective objective = board.getObjective(OBJECTIVE);
-
-        if (objective == null)
-            board.addObjective(OBJECTIVE, ObjectiveCriteria.DUMMY, Component.empty(), ObjectiveCriteria.RenderType.INTEGER, false, null);
+    public static void setLocked(ServerPlayer player, boolean locked) {
+        player.setAttached(DataAttachments.SCALE_LOCKED, locked);
     }
 }

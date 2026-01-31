@@ -29,7 +29,6 @@ public class ForceScale {
 
                             Collection<ServerPlayer> players = EntityArgument.getPlayers(ctx, "player");
                             for (ServerPlayer player : players) {
-                                ScalerUtil.createObjectiveIfMissing(player);
                                 applyScaleToPlayer(player, scale);
                             }
 

@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.justmili.servertweaks.mechanics.events.Banishment;
-import net.justmili.servertweaks.mechanics.events.Scaling;
+import net.justmili.servertweaks.mechanics.events.ScaleConvert;
 
 public class Events {
     public static void register() {
@@ -13,6 +13,6 @@ public class Events {
         ServerTickEvents.END_WORLD_TICK.register(Banishment::onWorldTick);
         ServerEntityEvents.ENTITY_LOAD.register(Banishment::onEntityLoad);
 
-        ServerPlayConnectionEvents.JOIN.register(Scaling::onServerJoined);
+        ServerPlayConnectionEvents.JOIN.register(ScaleConvert::onServerJoined);
     }
 }
