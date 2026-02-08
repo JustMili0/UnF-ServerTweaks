@@ -1,11 +1,11 @@
-package net.justmili.servertweaks.commands;
+package net.justmili.servertweaks.commands.administrative;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
-import net.justmili.servertweaks.ServerTweaks;
+import net.justmili.servertweaks.util.CommandUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -49,22 +49,22 @@ public class DamageToggle {
 
         dispatcher.register(
             Commands.literal("damagetoggle")
-                .requires(src -> ServerTweaks.hasPerms(src, 4))
+                .requires(src -> CommandUtil.hasPerms(src, 4))
                 .then(Commands.argument("type", IdentifierArgument.id())
                     .suggests(DamageToggle::suggestDamageTypes)
                     .then(Commands.literal("true")
-                        .executes(ctx -> setDamage(ctx, false)))
+                        .executes(context -> setDamage(context, false)))
                     .then(Commands.literal("false")
-                        .executes(ctx -> setDamage(ctx, true)))
+                        .executes(context -> setDamage(context, true)))
                     .then(Commands.literal("status")
                         .executes(DamageToggle::sendStatus))
                 )
         );
     }
     //Suggests damage types
-    private static CompletableFuture<Suggestions> suggestDamageTypes(CommandContext<CommandSourceStack> ctx, SuggestionsBuilder builder) {
+    private static CompletableFuture<Suggestions> suggestDamageTypes(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         Registry<DamageType> registry =
-            ctx.getSource()
+            context.getSource()
                 .getServer()
                 .registryAccess()
                 .lookupOrThrow(Registries.DAMAGE_TYPE);
@@ -82,12 +82,12 @@ public class DamageToggle {
     }
 
     //Feedback
-    private static int setDamage(CommandContext<CommandSourceStack> ctx, boolean disable) {
-        Identifier id = IdentifierArgument.getId(ctx, "type");
+    private static int setDamage(CommandContext<CommandSourceStack> context, boolean disable) {
+        Identifier id = IdentifierArgument.getId(context, "type");
 
         damageDisabled.put(id, disable);
 
-        ctx.getSource().sendSuccess(
+        context.getSource().sendSuccess(
             () -> Component.literal("Damage type '")
                 .append(Component.literal(id.toString()).withStyle(ChatFormatting.AQUA))
                 .append(Component.literal("' is now "))
@@ -97,12 +97,12 @@ public class DamageToggle {
         );
         return 1;
     }
-    private static int sendStatus(CommandContext<CommandSourceStack> ctx) {
-        Identifier id = IdentifierArgument.getId(ctx, "type");
+    private static int sendStatus(CommandContext<CommandSourceStack> context) {
+        Identifier id = IdentifierArgument.getId(context, "type");
 
         boolean disabled = damageDisabled.getOrDefault(id, false);
 
-        ctx.getSource().sendSuccess(
+        context.getSource().sendSuccess(
             () -> Component.literal("Damage type '")
                 .append(Component.literal(id.toString()).withStyle(ChatFormatting.AQUA))
                 .append(Component.literal("' status: "))

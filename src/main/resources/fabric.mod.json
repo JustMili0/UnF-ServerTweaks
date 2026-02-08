@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "servertweaks",
-  "version": "${mod_version}",
+  "version": "${mod_version}+mc${minecraft_version}",
   "name": "Useful & Fun Server Tweaks",
   "description": "",
   "authors": [

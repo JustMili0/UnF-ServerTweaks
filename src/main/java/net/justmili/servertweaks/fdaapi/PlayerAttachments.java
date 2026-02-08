@@ -5,12 +5,18 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.justmili.servertweaks.ServerTweaks;
 
-public final class DataAttachments {
+public final class PlayerAttachments {
     public static final AttachmentType<Boolean> SCALE_LOCKED =
         AttachmentRegistry.<Boolean>builder().initializer(() -> false)
             .persistent(Codec.BOOL)
             .copyOnDeath()
-            .buildAndRegister(ServerTweaks.asId("scale_locked"));
+            .buildAndRegister(ServerTweaks.asResource("scale_locked"));
 
-    private DataAttachments() {}
+    public static final AttachmentType<Boolean> IS_AFK =
+        AttachmentRegistry.<Boolean>builder().initializer(() -> false)
+            .persistent(Codec.BOOL)
+            .copyOnDeath()
+            .buildAndRegister(ServerTweaks.asResource("is_afk"));
+
+    private PlayerAttachments() {}
 }

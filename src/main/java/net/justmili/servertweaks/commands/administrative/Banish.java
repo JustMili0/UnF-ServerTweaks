@@ -1,8 +1,8 @@
-package net.justmili.servertweaks.commands;
+package net.justmili.servertweaks.commands.administrative;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.justmili.servertweaks.ServerTweaks;
 import net.justmili.servertweaks.init.Dimensions;
+import net.justmili.servertweaks.util.CommandUtil;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -16,11 +16,11 @@ public class Banish {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext, Commands.CommandSelection environment) {
         dispatcher.register(
             Commands.literal("banish")
-                .requires(src -> ServerTweaks.hasPerms(src, 4))
+                .requires(src -> CommandUtil.hasPerms(src, 4))
                 .then(Commands.argument("player", EntityArgument.player())
-                    .executes(ctx -> {
-                        ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
-                        CommandSourceStack source = ctx.getSource();
+                    .executes(context -> {
+                        ServerPlayer target = EntityArgument.getPlayer(context, "player");
+                        CommandSourceStack source = context.getSource();
                         ServerLevel banishmentLevel = source.getServer().getLevel(Dimensions.BANISHMENT_WORLD);
 
                         if (banishmentLevel == null) {

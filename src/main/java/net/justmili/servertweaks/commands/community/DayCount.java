@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.commands;
+package net.justmili.servertweaks.commands.community;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandBuildContext;
@@ -7,7 +7,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 
-public class GetDayCount {
+public class DayCount {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext, Commands.CommandSelection environment) {
         dispatcher.register(Commands.literal("daycount")
             .executes(context -> {

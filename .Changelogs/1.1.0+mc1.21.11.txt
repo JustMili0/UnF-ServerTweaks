@@ -1,0 +1,27 @@
+## 1.1.0+mc1.21.11 Changelog
+
+### ***NEW CONTENT***
+- Added `/afk` command
+  - Utilizes Teams to give the player a `[AFK] ` name prefix                                   (TO FIX)
+  - Makes the afk player invulnerable, but also player can not damage anything nor move when AFK    (MOVEMENT STOP NEEDS FINISHING)
+
+### ***CHANGED CONTENT***
+- Reworked `/scaleme` command, now named `/st-scale`
+  - Normal players can still use `/st-scale <height_cm>`
+  - Admins now have scaling tools:
+    - `/st-scale force <player> <height_cm>` - Forces specific scale on a player.
+    - `/st-scale unlock <player>` - Unlocks `Scale Lock` allowing the player to change their scale again.
+    - `/st-scale reset <player>` - Resets the player's scale to the base scale and unlocks `Scale Lock`
+    - `/st-scale reset-nounlock <player>` - Resets the player's scale to the base scale without unlocking the `Scale Lock`
+  - Commands `/scaleme` and `/forcescale` no longer exist in favor of the rework.
+
+### ***DEV STUFF***
+- In some commands renamed `CommandContext<CommandSourceStack> ctx` to `CommandContext<CommandSourceStack> context`, so everything is the same
+- Renamed method `ServerTweaks.asId` to `ServerTweaks.asResource`
+- Renamed class `DataAttachments` to `PlayerAttachments` for player data variables using Fabric Data Attachment API
+- Created class `FdaApiUtil`
+  - Moved and renamed methods from `Scalerutil.isLocked` and `Scalerutil.setLocked` to `FdaApiUtil.getBoolValue` and `FdaApiUtil.setBoolValue`
+- Created class `CommandUtil`
+  - Moved method `ServerTweaks.hasPerms` to `CommandUtil.hasPerms`
+  - Created "check-if-executed-from-server-or-by-player" method `CommandUtil.failCheck`
+- Renamed class `GetDayCount` to `DayCount`

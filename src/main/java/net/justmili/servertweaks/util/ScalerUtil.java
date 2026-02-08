@@ -1,6 +1,6 @@
 package net.justmili.servertweaks.util;
 
-import net.justmili.servertweaks.fdaapi.DataAttachments;
+import net.justmili.servertweaks.fdaapi.PlayerAttachments;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -13,7 +13,7 @@ public class ScalerUtil {
 
     //Converts old scoreboard scuff to fresh variables (purely for my own Minecraft server)
     public static void convertScoreToVar(ServerPlayer player) {
-        if (Boolean.TRUE.equals(player.getAttached(DataAttachments.SCALE_LOCKED))) return;
+        if (Boolean.TRUE.equals(player.getAttached(PlayerAttachments.SCALE_LOCKED))) return;
 
         Scoreboard board = player.level().getServer().getScoreboard();
         Objective objective = board.getObjective("scaleLocked");
@@ -24,7 +24,7 @@ public class ScalerUtil {
 
         // Migrate value
         if (score.get() > 0) {
-            player.setAttached(DataAttachments.SCALE_LOCKED, true);
+            player.setAttached(PlayerAttachments.SCALE_LOCKED, true);
             board.resetSinglePlayerScore(holder, objective);
         }
     }
@@ -41,13 +41,5 @@ public class ScalerUtil {
             instance.setBaseValue(scale);
             player.refreshDimensions();
         }
-    }
-
-    //For checking and locking the scale via variables (Fabric Data Attachment API)
-    public static boolean isLocked(ServerPlayer player) {
-        return Boolean.TRUE.equals(player.getAttached(DataAttachments.SCALE_LOCKED));
-    }
-    public static void setLocked(ServerPlayer player, boolean locked) {
-        player.setAttached(DataAttachments.SCALE_LOCKED, locked);
     }
 }
