@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.justmili.servertweaks.fdaapi.PlayerAttachments;
 import net.justmili.servertweaks.util.CommandUtil;
 import net.justmili.servertweaks.util.FdaApiUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.CommandSourceStack;
@@ -31,13 +32,16 @@ public class Afk {
                 if (team == null) {
                     team = scoreboard.addPlayerTeam(AFK_PLAYERS);
                     team.setNameTagVisibility(Team.Visibility.ALWAYS);
-                    team.setPlayerPrefix(Component.literal("[AFK] ").withStyle(style -> style.withColor(0xAAAAAA)));
-                    team.setColor(net.minecraft.ChatFormatting.GRAY);
+                    team.setPlayerPrefix(Component.literal("[AFK] "));
+                    team.setColor(ChatFormatting.GRAY);
                 }
 
-                //TODO
-                //Think of a way to stop the player from moving (walk, sprint, jump, teleport without breaking any modifiers given from items)
-                //Fix team add/remove
+                /*
+                TODO:
+                - Think of a way to stop the player from moving
+                    (walk, sprint, jump, teleport. Without breaking any modifiers given from items)
+                - Fix team add/remove
+                */
                 if (FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK)) {
                     scoreboard.removePlayerFromTeam(player.getScoreboardName(), team);
                     FdaApiUtil.setBoolValue(player, PlayerAttachments.IS_AFK, false);
