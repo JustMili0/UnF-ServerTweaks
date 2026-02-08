@@ -36,7 +36,7 @@ public class Afk {
                 }
 
                 //TODO
-                //Think of a way to stop the player from moving (walk, sprint, jump, teleport)
+                //Think of a way to stop the player from moving (walk, sprint, jump, teleport without breaking any modifiers given from items)
                 //Fix team add/remove
                 if (FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK)) {
                     scoreboard.removePlayerFromTeam(player.getScoreboardName(), team);
