@@ -10,7 +10,6 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Collection;
@@ -29,7 +28,7 @@ public class StScale {
                         CommandUtil.failCheck(source);
 
                         if (FdaApiUtil.getBoolValue(player, PlayerAttachments.SCALE_LOCKED)) {
-                            source.sendFailure(Component.literal("You can not change your height more than once."));
+                            CommandUtil.sendFail(source, "You can not change your height more than once.");
                             return 0;
                         }
 
@@ -38,7 +37,7 @@ public class StScale {
                         ScalerUtil.applyScaleToPlayer(player, scale);
                         FdaApiUtil.setBoolValue(player, PlayerAttachments.SCALE_LOCKED, true);
 
-                        source.sendSuccess(() -> Component.literal(String.format("Your irl-to-game scale is %.3f (%.1f cm). It is now locked.", scale, heightCm)), false);
+                        CommandUtil.sendSucc(source, String.format("Your irl-to-game scale is %.3f (%.1f cm). It is now locked.", scale, heightCm));
                         return 1;
                     })
                 )
@@ -56,7 +55,7 @@ public class StScale {
                                     applyScaleToPlayer(player, scale);
                                 }
 
-                                source.sendSuccess(() -> Component.literal(String.format("Applied scale %.3f (%.1f cm) to %d player(s).", scale, heightCm, players.size())), false);
+                                CommandUtil.sendSucc(source, String.format("Applied scale %.3f (%.1f cm) to %d player(s).", scale, heightCm, players.size()));
                                 return players.size();
                             })
                         )
@@ -73,7 +72,7 @@ public class StScale {
                                 FdaApiUtil.setBoolValue(player, PlayerAttachments.SCALE_LOCKED, false);
                             }
 
-                            source.sendSuccess(() -> Component.literal(String.format("Unlocked scale modification for %d player(s).", players.size())), false);
+                            CommandUtil.sendSucc(source, String.format("Unlocked scale modification for %d player(s).", players.size()));
                             return players.size();
                         })
                     )
@@ -90,7 +89,7 @@ public class StScale {
                                 FdaApiUtil.setBoolValue(player, PlayerAttachments.SCALE_LOCKED, false);
                             }
 
-                            source.sendSuccess(() -> Component.literal(String.format("Reset scale and unlocked scale modifications for %d player(s).", players.size())), false);
+                            CommandUtil.sendSucc(source, String.format("Reset scale and unlocked scale modifications for %d player(s).", players.size()));
                             return players.size();
                         })
                     )
@@ -106,7 +105,7 @@ public class StScale {
                                 applyScaleToPlayer(player, 1.0);
                             }
 
-                            source.sendSuccess(() -> Component.literal(String.format("Reset scale for %d player(s).", players.size())), false);
+                            CommandUtil.sendSucc(source, String.format("Reset scale for %d player(s).", players.size()));
                             return players.size();
                         })
                     )

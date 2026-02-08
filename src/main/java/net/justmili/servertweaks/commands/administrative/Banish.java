@@ -19,22 +19,23 @@ public class Banish {
                 .requires(src -> CommandUtil.hasPerms(src, 4))
                 .then(Commands.argument("player", EntityArgument.player())
                     .executes(context -> {
-                        ServerPlayer target = EntityArgument.getPlayer(context, "player");
+                        ServerPlayer player = EntityArgument.getPlayer(context, "player");
                         CommandSourceStack source = context.getSource();
                         ServerLevel banishmentLevel = source.getServer().getLevel(Dimensions.BANISHMENT_WORLD);
 
                         if (banishmentLevel == null) {
-                            source.sendFailure(Component.literal("Banishment dimension is not loaded."));
+                            CommandUtil.sendFail(source, "Banishment dimension is not loaded.");
                             return 0;
                         }
 
-                        target.teleportTo(banishmentLevel, 0.5, 2.0, 0.5, Relative.DELTA, target.getYRot(), target.getXRot(), true);
+                        player.teleportTo(banishmentLevel, 0.5, 2.0, 0.5, Relative.DELTA, player.getYRot(), player.getXRot(), true);
 
-                        target.sendSystemMessage(
-                            Component.literal("You have been banished. " +
-                                    "There is no way out - no death or portal can ever save you. " +
-                                    "This infinite world of darkness consumes everything that enters it, " +
-                                    "not even the void can escape itself.")
+                        CommandUtil.sendTo(player,
+                            """
+                                You have been banished.
+                                There is no way out - no death or portal can ever save you.
+                                This infinite world of darkness consumes everything that enters it, not even the void can escape itself.
+                                """
                         );
 
                         return 1;

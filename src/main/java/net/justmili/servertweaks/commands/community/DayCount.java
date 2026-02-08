@@ -1,10 +1,10 @@
 package net.justmili.servertweaks.commands.community;
 
 import com.mojang.brigadier.CommandDispatcher;
+import net.justmili.servertweaks.util.CommandUtil;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 
 public class DayCount {
@@ -17,8 +17,8 @@ public class DayCount {
                 long dayTime = world.getDayTime() / 24000L;
                 long gameTime = world.getGameTime() / 24000L;
 
-                source.sendSuccess(() -> Component.literal("Day Time: " + dayTime + " day" + (dayTime == 1 ? "" : "s")), false);
-                source.sendSuccess(() -> Component.literal("Game Time: " + gameTime + " day" + (gameTime == 1 ? "" : "s")), false);
+                CommandUtil.sendSucc(source, "Day Time: " + dayTime + " day" + (dayTime == 1 ? "" : "s"));
+                CommandUtil.sendSucc(source, "Game Time: " + gameTime + " day" + (gameTime == 1 ? "" : "s"));
 
                 return 1;
             }));

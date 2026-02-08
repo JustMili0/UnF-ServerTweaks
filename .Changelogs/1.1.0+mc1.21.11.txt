@@ -2,7 +2,7 @@
 
 ### ***NEW CONTENT***
 - Added `/afk` command
-  - Utilizes Teams to give the player a `[AFK] ` name prefix                                   (TO FIX)
+  - Utilizes Teams to give the player a `[AFK] ` name prefix                                        (TO FIX)
   - Makes the afk player invulnerable, but also player can not damage anything nor move when AFK    (MOVEMENT STOP NEEDS FINISHING)
 
 ### ***CHANGED CONTENT***
@@ -21,7 +21,9 @@
 - Renamed class `DataAttachments` to `PlayerAttachments` for player data variables using Fabric Data Attachment API
 - Created class `FdaApiUtil`
   - Moved and renamed methods from `Scalerutil.isLocked` and `Scalerutil.setLocked` to `FdaApiUtil.getBoolValue` and `FdaApiUtil.setBoolValue`
+  - Additionally made similar methods for Strings, ints, doubles, floats and longs
 - Created class `CommandUtil`
   - Moved method `ServerTweaks.hasPerms` to `CommandUtil.hasPerms`
   - Created "check-if-executed-from-server-or-by-player" method `CommandUtil.failCheck`
+  - Created methods `sendFail` (source sendFailure), `sendSucc` (source sendSuccess) and `sendTo` (player sendSystemMessage)
 - Renamed class `GetDayCount` to `DayCount`
