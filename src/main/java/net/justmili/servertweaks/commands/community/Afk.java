@@ -29,7 +29,7 @@ public class Afk {
 
                 ServerScoreboard scoreboard = world.getScoreboard();
                 PlayerTeam team = scoreboard.getPlayerTeam(AFK_PLAYERS);
-                //Create team if doesn't exist
+                //Create team if it doesn't exist
                 if (team == null) {
                     team = scoreboard.addPlayerTeam(AFK_PLAYERS);
                     team.setNameTagVisibility(Team.Visibility.ALWAYS);
