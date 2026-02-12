@@ -1,5 +1,5 @@
 ## 1.1.2+mc1.21.11 Changelog
--# 1.1.0 and 1.1.1 were skipped as they were debug and wip versions
+<small>1.1.0 and 1.1.1 were skipped as they were debug and wip versions</small>
 
 ### ***CONFIGURATION***
 - The mod now has a config file!
@@ -11,7 +11,9 @@
 - Added `/afk` command
   - Utilizes Teams to give the player a `[AFK] ` name prefix
   - Makes the afk player invulnerable, but also player can not damage anything nor move in any way when AFK
-  - When coming out of AFK, if it's night, all instances of Monster entities will be despawned (BEHAVIOR CAN BE TURMED OFF IN CONFIG) [WIP]
+  - When coming out of AFK, if it's night, all instances of Monster entities will be despawned in a 16x16x16 area of the player
+    - THIS BEHAVIOR CAN BE TURNED OFF IN CONFIG
+    - Only targets "wild" Monsters (not nametagged, not in vehicles)
     - Command has a 5min (6000 ticks) cooldown (TIME CAN BE CHANGED IN CONFIG)
 
 ### ***CHANGED CONTENT***
