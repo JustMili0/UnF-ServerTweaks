@@ -1,6 +1,7 @@
 package net.justmili.servertweaks.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.fdaapi.PlayerAttachments;
 import net.justmili.servertweaks.util.CommandUtil;
 import net.justmili.servertweaks.util.FdaApiUtil;
@@ -12,6 +13,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.ServerScoreboard;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
 
@@ -27,8 +31,15 @@ public class Afk {
                 ServerLevel world = source.getLevel();
                 ServerPlayer player = source.getPlayer();
 
+                int cooldown = FdaApiUtil.getIntValue(player, PlayerAttachments.AFK_COOLDOWN);
+                if (!FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK) && Config.commandCooldown != 0 && cooldown > 0) {
+                    CommandUtil.sendFail(source, "You must wait " + (cooldown / 20) + "s before using this command again.");
+                    return 0;
+                }
+
                 ServerScoreboard scoreboard = world.getScoreboard();
                 PlayerTeam team = scoreboard.getPlayerTeam(AFK_PLAYERS);
+
                 //Create team if it doesn't exist
                 if (team == null) {
                     team = scoreboard.addPlayerTeam(AFK_PLAYERS);
@@ -37,22 +48,48 @@ public class Afk {
                     team.setColor(ChatFormatting.GRAY);
                 }
 
-                /*
-                TODO:
-                - Think of a way to stop the player from moving
-                    (walk, sprint, jump, teleport. Without breaking any modifiers given from items)
-                - Fix team add/remove
-                */
                 if (FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK)) {
+                    //Remove from team and set IS_aFK to false
                     scoreboard.removePlayerFromTeam(player.getScoreboardName(), team);
                     FdaApiUtil.setBoolValue(player, PlayerAttachments.IS_AFK, false);
-                }
-                if (!FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK)) {
+
+                    //Reset command cooldown
+                    FdaApiUtil.setIntValue(player, PlayerAttachments.AFK_COOLDOWN, Config.commandCooldown);
+
+                    //If enabled, despawn
+                    if (Config.despawnMonsters && player.level() instanceof ServerLevel level) {
+                        despawnNearbyMonsters(player, level);
+                    }
+                } else {
+                    //Set position at which command was executed at
+                    //Add to team and set IS_AFK to true
+                    Vec3 pos = player.position();
+                    FdaApiUtil.setDoubleValue(player, PlayerAttachments.AFK_X, pos.x);
+                    FdaApiUtil.setDoubleValue(player, PlayerAttachments.AFK_Y, pos.y);
+                    FdaApiUtil.setDoubleValue(player, PlayerAttachments.AFK_Z, pos.z);
+
                     scoreboard.addPlayerToTeam(player.getScoreboardName(), team);
                     FdaApiUtil.setBoolValue(player, PlayerAttachments.IS_AFK, true);
                 }
+
                 return 1;
             })
         );
+    }
+
+    private static void despawnNearbyMonsters(ServerPlayer player, ServerLevel level) {
+        if (level.isBrightOutside()) return;
+        AABB box = new AABB(
+            player.getX() - 8, player.getY() - 8, player.getZ() - 8,
+            player.getX() + 8, player.getY() + 8, player.getZ() + 8
+        );
+
+        for (Monster monster : level.getEntitiesOfClass(Monster.class, box)) {
+            if (monster.hasCustomName()) continue;
+            if (monster.isPassenger()) continue;
+            if (monster.isVehicle()) continue;
+
+            monster.discard();
+        }
     }
 }

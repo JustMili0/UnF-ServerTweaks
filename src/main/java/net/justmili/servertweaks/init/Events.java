@@ -13,6 +13,7 @@ public class Events {
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(Banishment::onEntityHurt);
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(WhileAfk::onEntityHurt);
         ServerTickEvents.END_WORLD_TICK.register(Banishment::onWorldTick);
+        ServerTickEvents.END_SERVER_TICK.register(WhileAfk::onServerTick);
         ServerEntityEvents.ENTITY_LOAD.register(Banishment::onEntityLoad);
         ServerPlayConnectionEvents.JOIN.register(ScaleConvert::onServerJoined);
     }

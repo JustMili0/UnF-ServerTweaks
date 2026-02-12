@@ -16,6 +16,10 @@ public class Config {
     //Config for "RemoveAnvilLimit" mixin.
     public static boolean removeAnvilLimit = true;
 
+    //Config for "Afk" command.
+    public static boolean despawnMonsters = true;
+    public static int commandCooldown = 6000;
+
     //Load config
     public static void load(Path configDir) {
         Path configPath = configDir.resolve(CFG_FILE);
@@ -36,6 +40,9 @@ public class Config {
         content.append("    limitVehicleSpeed = ").append(limitVehicleSpeed).append("\n\n");
         content.append("[RemoveAnvilLimit.Mixin]\n");
         content.append("    removeAnvilLimit = ").append(removeAnvilLimit).append("\n");
+        content.append("[Afk.Command]");
+        content.append("    despawnMonsters = ").append(despawnMonsters).append("\n");
+        content.append("    commandCooldown = ").append(commandCooldown).append("\n");
 
         try {
             Files.writeString(path, content.toString());
@@ -43,6 +50,7 @@ public class Config {
             e.printStackTrace();
         }
     }
+
     private static void loadConfig(Path path) {
         try {
             List<String> lines = Files.readAllLines(path);
@@ -59,6 +67,8 @@ public class Config {
                     case "limitElytraSpeed" -> limitElytraSpeed = Boolean.parseBoolean(value);
                     case "limitVehicleSpeed" -> limitVehicleSpeed = Boolean.parseBoolean(value);
                     case "removeAnvilLimit" -> removeAnvilLimit = Boolean.parseBoolean(value);
+                    case "despawnMonsters" -> despawnMonsters = Boolean.parseBoolean(value);
+                    case "commandCooldown" -> commandCooldown = Integer.parseInt(value);
                 }
             }
         } catch (IOException e) {
