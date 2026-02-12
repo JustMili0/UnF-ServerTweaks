@@ -1,9 +1,7 @@
 package net.justmili.servertweaks.init;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.justmili.servertweaks.commands.administrative.*;
-import net.justmili.servertweaks.commands.community.*;
-import net.justmili.servertweaks.commands.mixed.*;
+import net.justmili.servertweaks.commands.*;
 
 public class Commands {
     public static void register() {

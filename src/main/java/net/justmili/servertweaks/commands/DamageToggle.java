@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.commands.administrative;
+package net.justmili.servertweaks.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;

@@ -2,7 +2,6 @@ package net.justmili.servertweaks.mechanics.events;
 
 import net.justmili.servertweaks.fdaapi.PlayerAttachments;
 import net.justmili.servertweaks.util.FdaApiUtil;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;

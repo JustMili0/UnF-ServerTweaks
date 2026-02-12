@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.commands.community;
+package net.justmili.servertweaks.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.justmili.servertweaks.fdaapi.PlayerAttachments;

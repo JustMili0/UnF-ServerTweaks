@@ -1,6 +1,8 @@
 ## 1.1.0+mc1.21.11 Changelog
 
 ### ***NEW CONTENT***
+- No more "Moved too fast" warn.
+  - Mainly done for elytra cannons
 - Added `/afk` command
   - Utilizes Teams to give the player a `[AFK] ` name prefix                                        (TO FIX)
   - Makes the afk player invulnerable, but also player can not damage anything nor move when AFK    (MOVEMENT STOP NEEDS FINISHING)
@@ -15,6 +17,9 @@
     - `/st-scale reset-nounlock <player>` - Resets the player's scale to the base scale without unlocking the `Scale Lock`
   - Commands `/scaleme` and `/forcescale` no longer exist in favor of the rework.
 
+### ***CONFIGURATION***
+- The mod now has a config file!
+
 ### ***DEV STUFF***
 - In some commands renamed `CommandContext<CommandSourceStack> ctx` to `CommandContext<CommandSourceStack> context`, so everything is the same
 - Renamed method `ServerTweaks.asId` to `ServerTweaks.asResource`
@@ -27,3 +32,4 @@
   - Created "check-if-executed-from-server-or-by-player" method `CommandUtil.failCheck`
   - Created methods `sendFail` (source sendFailure), `sendSucc` (source sendSuccess) and `sendTo` (player sendSystemMessage)
 - Renamed class `GetDayCount` to `DayCount`
+- Renamed mixin class `NotTooExpensive` to `RemoveAnvilLimit`

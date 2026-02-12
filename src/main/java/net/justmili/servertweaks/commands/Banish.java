@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.commands.administrative;
+package net.justmili.servertweaks.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.justmili.servertweaks.init.Dimensions;
@@ -7,7 +7,6 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Relative;
