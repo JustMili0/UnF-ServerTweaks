@@ -12,5 +12,5 @@
 - Added indicators for commands with outputs, now displaying from what mod the command is
 - Method `Afk.despawnNearbyMonsters` no longer depends on ServerLevel. It just gets it from the player instead.
 - Created methods `PlayerAttachments.createValue` and `PlayerAttachments.createPersistentValue`
-  - `createPersistentValue` values will not be cleared after server/game restart [UNFINISHED]
+  - `createPersistentValue` values will not be cleared after server/game restart
   - `createValue` values will be cleared after server/game restart
