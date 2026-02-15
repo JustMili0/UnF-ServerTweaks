@@ -1,0 +1,8 @@
+## 1.1.4+mc1.21.11 Changelog
+
+### ***BUG FIXES***
+- Fixed teleport to coords `0/0/0` or `0/255/0` (depends on which version of the mod you started with) at relog when AFK (`/afk`)
+
+### ***DEV STUFF***
+- Moved methods `PlayerAttachments.createValue` and `PlayerAttachments.createPersistentValue` to `FdaApiUtil.createValue` and `FdaApiUtil.createPersistentValue`
+- Made all afk-command-related variables persistent in `PlayerAttachments`

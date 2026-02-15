@@ -1,6 +1,9 @@
 package net.justmili.servertweaks.util;
 
+import com.mojang.serialization.Codec;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.justmili.servertweaks.ServerTweaks;
 import net.minecraft.server.level.ServerPlayer;
 
 @SuppressWarnings({"UnstableApiUsage", "NullableProblems"})
@@ -46,8 +49,24 @@ public class FdaApiUtil {
     }
 
     //Helper
+    //Gets value of provided variable
     public static <T> T getValue(ServerPlayer player, AttachmentType<T> variable, T defaultValue) {
         if (variable == null) return defaultValue;
         return player.getAttachedOrElse(variable, defaultValue);
+    }
+    //Creates values that will clear after a restart
+    public static <T> AttachmentType<T> createValue(String path, T defaultValue, Codec<T> codec) {
+        return AttachmentRegistry.create(ServerTweaks.asResource(path),
+            builder -> builder.initializer(() -> defaultValue)
+                .copyOnDeath()
+        );
+    }
+    //Creates values that will NOT clear after a restart
+    public static <T> AttachmentType<T> createPersistentValue(String path, T defaultValue, Codec<T> codec) {
+        return AttachmentRegistry.create(ServerTweaks.asResource(path),
+            builder -> builder.initializer(() -> defaultValue)
+                .copyOnDeath()
+                .persistent(codec)
+        );
     }
 }
