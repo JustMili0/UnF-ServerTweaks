@@ -48,7 +48,6 @@ public class FdaApiUtil {
     //Helper
     public static <T> T getValue(ServerPlayer player, AttachmentType<T> variable, T defaultValue) {
         if (variable == null) return defaultValue;
-        T value = player.getAttached(variable);
-        return value != null ? value : defaultValue;
+        return player.getAttachedOrElse(variable, defaultValue);
     }
 }

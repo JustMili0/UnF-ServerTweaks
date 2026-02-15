@@ -4,9 +4,6 @@
 - Switched to using SuperMartijn642's Config Lib (It is now a dependency)
 - You can now disable any command in the mod within the config
 
-### ***BUG FIXES***
-- Fixed issue with Fabric Data Attachments API values being cleared after server/game restarts [WIP, STILL CAN'T FIGURE IT OUT]
-
 ### ***DEV STUFF***
 - Mod now also works in singleplayer for people that want things like `/afk`, `/damagetoggle`, `/scale` and everything else in survival
 - Renamed method `CommandUtil.failCheck` to `CommandUtil.checkIfPlayerExecuted`

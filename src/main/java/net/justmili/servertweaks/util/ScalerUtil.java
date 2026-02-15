@@ -13,7 +13,7 @@ public class ScalerUtil {
 
     //Converts old scoreboard scuff to fresh variables (purely for my own Minecraft server)
     public static void convertScoreToVar(ServerPlayer player) {
-        if (Boolean.TRUE.equals(player.getAttached(PlayerAttachments.SCALE_LOCKED))) return;
+        if (player.getAttachedOrElse(PlayerAttachments.SCALE_LOCKED, false)) return;
 
         Scoreboard board = player.level().getServer().getScoreboard();
         Objective objective = board.getObjective("scaleLocked");

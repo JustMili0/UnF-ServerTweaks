@@ -1,6 +1,7 @@
 package net.justmili.servertweaks;
 
 import net.fabricmc.api.ModInitializer;
+import net.justmili.servertweaks.fdaapi.PlayerAttachments;
 import net.justmili.servertweaks.init.Commands;
 import net.justmili.servertweaks.init.Dimensions;
 import net.justmili.servertweaks.init.Events;
@@ -15,6 +16,7 @@ public class ServerTweaks implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Initilazing Server Tweaks...");
+        PlayerAttachments.register();
         Commands.register();
         Dimensions.register();
         Events.register();
