@@ -18,17 +18,17 @@ public abstract class RemoveAnvilLimit {
 
     @ModifyConstant(method = "createResult", constant = @Constant(intValue = 40))
     private int removeTooExpensive(int i) {
-        if (!Config.removeAnvilLimit) return i;
+        if (!Config.removeAnvilLimit.get()) return i;
         return Integer.MAX_VALUE;
     }
     @ModifyConstant(method = "createResult", constant = @Constant(intValue = 39))
     private int removeClamp(int i) {
-        if (!Config.removeAnvilLimit) return i;
+        if (!Config.removeAnvilLimit.get()) return i;
         return Integer.MAX_VALUE - 1;
     }
     @Inject(method = "createResult", at = @At("RETURN"))
     private void clampVisibleCost(CallbackInfo ci) {
-        if (Config.removeAnvilLimit && this.cost.get() >= 40) {
+        if (!Config.removeAnvilLimit.get() && this.cost.get() >= 40) {
             this.cost.set(39);
         }
     }

@@ -1,10 +1,13 @@
 package net.justmili.servertweaks.util;
 
+import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permission;
 import net.minecraft.server.permissions.PermissionLevel;
+
+import java.util.function.Supplier;
 
 public class CommandUtil {
     //Fuck the new perms system, I want my numbers back
@@ -13,13 +16,17 @@ public class CommandUtil {
     }
 
     //Prevents commands from being ran from server console
-    public static int failCheck(CommandSourceStack source) {
+    public static void checkIfPlayerExecuted(CommandContext<CommandSourceStack> context) {
+        CommandSourceStack source = context.getSource();
         if (!(source.getEntity() instanceof ServerPlayer)) {
-            /// Change source to get the command that was ran
-            sendFail(source, "Failed to execute \"" + source + "\" - Command must be ran by a player.");
-            return 0;
+            sendFail(source, "Failed to execute \"" + context.getInput() + "\" - Command must be ran by a player.");
         }
-        return 1;
+    }
+
+    //For if command is disabled on the server (USE AT COMMAND REGISTRATION)
+    public static <T> boolean checkIfExpected(Supplier<T> configKey, boolean expected) {
+        //I know it's a stupid one, and pretty unnecessary, but fuck you
+        return configKey.get().equals(expected);
     }
 
     public static void sendSucc(CommandSourceStack source, String message) {

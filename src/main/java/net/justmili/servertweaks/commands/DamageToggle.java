@@ -88,7 +88,7 @@ public class DamageToggle {
         damageDisabled.put(id, disable);
 
         context.getSource().sendSuccess(
-            () -> Component.literal("Damage type '")
+            () -> Component.literal("[ServerTweaks] Damage type '")
                 .append(Component.literal(id.toString()).withStyle(ChatFormatting.AQUA))
                 .append(Component.literal("' is now "))
                 .append(Component.literal(disable ? "DISABLED" : "ENABLED")
@@ -103,7 +103,7 @@ public class DamageToggle {
         boolean disabled = damageDisabled.getOrDefault(id, false);
 
         context.getSource().sendSuccess(
-            () -> Component.literal("Damage type '")
+            () -> Component.literal("[ServerTweaks] Damage type '")
                 .append(Component.literal(id.toString()).withStyle(ChatFormatting.AQUA))
                 .append(Component.literal("' status: "))
                 .append(Component.literal(disabled ? "DISABLED" : "ENABLED")

@@ -1,0 +1,19 @@
+## 1.1.3+mc1.21.11 Changelog
+
+### ***CONFIG***
+- Switched to using SuperMartijn642's Config Lib (It is now a dependency)
+- You can now disable any command in the mod within the config
+
+### ***BUG FIXES***
+- Fixed issue with Fabric Data Attachments API values being cleared after server/game restarts [WIP, STILL CAN'T FIGURE IT OUT]
+
+### ***DEV STUFF***
+- Mod now also works in singleplayer for people that want things like `/afk`, `/damagetoggle`, `/scale` and everything else in survival
+- Renamed method `CommandUtil.failCheck` to `CommandUtil.checkIfPlayerExecuted`
+- Changed method `CommandUtil.checkIfPlayerExecuted` to use `CommandContext<CommandSourceStack> context` instead of `CommandSourceStack source`
+- Fixed error notification from `CommandUtil.checkIfPlayerExecuted(context)` to display executed command in message instead of command source
+- Added indicators for commands with outputs, now displaying from what mod the command is
+- Method `Afk.despawnNearbyMonsters` no longer depends on ServerLevel. It just gets it from the player instead.
+- Created methods `PlayerAttachments.createValue` and `PlayerAttachments.createPersistentValue`
+  - `createPersistentValue` values will not be cleared after server/game restart [UNFINISHED]
+  - `createValue` values will be cleared after server/game restart

@@ -1,78 +1,66 @@
 package net.justmili.servertweaks.config;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
+import com.supermartijn642.configlib.api.ConfigBuilders;
+import com.supermartijn642.configlib.api.IConfigBuilder;
+
+import java.util.function.Supplier;
 
 public class Config {
-    private static final String CFG_FILE = "servertweaks.toml";
-
-    // Config for "UncapSpeedLimits" mixin.
-    public static boolean limitPlayerSpeed = true;
-    public static boolean limitElytraSpeed = false;
-    public static boolean limitVehicleSpeed = true;
-
-    //Config for "RemoveAnvilLimit" mixin.
-    public static boolean removeAnvilLimit = true;
+    //Individual configs for each command.
+    public static final Supplier<Boolean> enableAfkCommand;
+    public static final Supplier<Boolean> enableScaleCommand;
+    ///public static final Supplier<Boolean> enableDuelCommand; //WIP Command
+    public static final Supplier<Boolean> enableDaycountCommand;
+    public static final Supplier<Boolean> enableDamageToggleCommand;
+    public static final Supplier<Boolean> enableBanishCommand;
 
     //Config for "Afk" command.
-    public static boolean despawnMonsters = true;
-    public static int commandCooldown = 6000;
+    public static final Supplier<Boolean> despawnMonsters;
+    public static final Supplier<Integer> afkCommandCooldown;
 
-    //Load config
-    public static void load(Path configDir) {
-        Path configPath = configDir.resolve(CFG_FILE);
-        if (Files.notExists(configPath)) {
-            saveDefault(configPath);
-        } else {
-            loadConfig(configPath);
-        }
+    // Config for "UncapSpeedLimits" mixin.
+    public static final Supplier<Boolean> limitPlayerSpeed;
+    public static final Supplier<Boolean> limitElytraSpeed;
+    public static final Supplier<Boolean> limitVehicleSpeed;
+
+    //Config for "RemoveAnvilLimit" mixin.
+    public static final Supplier<Boolean> removeAnvilLimit;
+    
+    static {
+        // construct a new config builder
+        IConfigBuilder oldCfg = ConfigBuilders.newTomlConfig("servertweaks", "", false);
+        oldCfg.comment("THIS CONFIG FILE IS NO LONGER SUPPORTED BY SERVERTWEAKS");
+        IConfigBuilder builder = ConfigBuilders.newTomlConfig("servertweaks", "new", false);
+
+        builder.push("Commands");
+        builder.comment("Should these commands be enabled on the server?");
+        enableAfkCommand = builder.define("enableAfkCommand", true);
+        enableScaleCommand = builder.define("enableScaleCommand", true);
+        ///enableDuelCommand = builder.define("enableDuelCommand", true);
+        enableDaycountCommand = builder.define("enableDaycountCommand", true);
+        enableDamageToggleCommand = builder.define("enableDamageToggleCommand", true);
+        enableBanishCommand = builder.define("enableBanishCommand", true);
+        builder.pop();
+
+        builder.push("AFK-Command-Specific");
+        despawnMonsters = builder.comment("Should \"wild\" monsters despawn around the player when coming out of AFK?")
+            .define("despawnMonsters", true);
+        afkCommandCooldown = builder.comment("Amount of time between the AFK command can be used again.")
+            .define("afkCommandCooldown", 6000, 0, Integer.MAX_VALUE-255);
+        builder.pop();
+
+        builder.push("Mixins");
+        limitPlayerSpeed = builder.comment("Should the server stop the player from moving too fast and print \"Player moved too fast!\" warn when on foot?")
+            .define("limitPlayerSpeed", true);
+        limitElytraSpeed = builder.comment("Should the server stop the player from flying too fast and print \"Player moved too fast!\" warn when on elytra?")
+            .define("limitElytraSpeed", false);
+        limitVehicleSpeed = builder.comment("Should the server stop the player from going too fast and print \"Player moved too fast!\" warn when in/on vehicle?")
+            .define("limitVehicleSpeed", true);
+        removeAnvilLimit = builder.comment("Should the server clamp the max anvil cost to 39 levels if at or over, to prevent \"Too Expensive\"?")
+            .define("removeAnvilLimit", true);
+        builder.pop();
+
+        builder.build();
     }
 
-    //Load/save values
-    private static void saveDefault(Path path) {
-        StringBuilder content = new StringBuilder();
-        content.append("# ServerTweaks Config\n\n");
-        content.append("[UncapSpeedLimits.Mixin]\n");
-        content.append("    limitPlayerSpeed = ").append(limitPlayerSpeed).append("\n");
-        content.append("    limitElytraSpeed = ").append(limitElytraSpeed).append("\n");
-        content.append("    limitVehicleSpeed = ").append(limitVehicleSpeed).append("\n\n");
-        content.append("[RemoveAnvilLimit.Mixin]\n");
-        content.append("    removeAnvilLimit = ").append(removeAnvilLimit).append("\n");
-        content.append("[Afk.Command]");
-        content.append("    despawnMonsters = ").append(despawnMonsters).append("\n");
-        content.append("    commandCooldown = ").append(commandCooldown).append("\n");
-
-        try {
-            Files.writeString(path, content.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void loadConfig(Path path) {
-        try {
-            List<String> lines = Files.readAllLines(path);
-            for (String line : lines) {
-                line = line.split("#")[0].trim();
-                if (line.isEmpty() || !line.contains("=")) continue;
-
-                String[] parts = line.split("=", 2);
-                String key = parts[0].trim();
-                String value = parts[1].trim();
-
-                switch (key) {
-                    case "limitPlayerSpeed" -> limitPlayerSpeed = Boolean.parseBoolean(value);
-                    case "limitElytraSpeed" -> limitElytraSpeed = Boolean.parseBoolean(value);
-                    case "limitVehicleSpeed" -> limitVehicleSpeed = Boolean.parseBoolean(value);
-                    case "removeAnvilLimit" -> removeAnvilLimit = Boolean.parseBoolean(value);
-                    case "despawnMonsters" -> despawnMonsters = Boolean.parseBoolean(value);
-                    case "commandCooldown" -> commandCooldown = Integer.parseInt(value);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

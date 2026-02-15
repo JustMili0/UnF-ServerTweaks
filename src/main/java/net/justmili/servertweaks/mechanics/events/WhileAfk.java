@@ -35,7 +35,7 @@ public class WhileAfk {
             }
 
             //Set/reset command timer
-            if (!FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK) && Config.commandCooldown != 0) {
+            if (!FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK) && Config.afkCommandCooldown.get() != 0) {
                 int cooldown = FdaApiUtil.getIntValue(player, PlayerAttachments.AFK_COOLDOWN);
                 if (cooldown > 0) {
                     FdaApiUtil.setIntValue(player, PlayerAttachments.AFK_COOLDOWN, cooldown - 1);

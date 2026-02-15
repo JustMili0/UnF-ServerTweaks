@@ -16,7 +16,7 @@ import java.util.Collection;
 
 import static net.justmili.servertweaks.util.ScalerUtil.applyScaleToPlayer;
 
-public class StScale {
+public class Scale {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext, Commands.CommandSelection environment) {
         dispatcher.register(
             Commands.literal("scale")
@@ -25,7 +25,7 @@ public class StScale {
                         CommandSourceStack source = context.getSource();
                         ServerPlayer player = source.getPlayer();
 
-                        CommandUtil.failCheck(source);
+                        CommandUtil.checkIfPlayerExecuted(context);
 
                         if (FdaApiUtil.getBoolValue(player, PlayerAttachments.SCALE_LOCKED)) {
                             CommandUtil.sendFail(source, "You can not change your height more than once.");

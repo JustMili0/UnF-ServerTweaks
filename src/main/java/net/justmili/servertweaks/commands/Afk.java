@@ -26,14 +26,14 @@ public class Afk {
         dispatcher.register(Commands.literal("afk")
             .executes(context -> {
                 CommandSourceStack source = context.getSource();
-                CommandUtil.failCheck(source);
+                CommandUtil.checkIfPlayerExecuted(context);
 
                 ServerLevel world = source.getLevel();
                 ServerPlayer player = source.getPlayer();
 
                 int cooldown = FdaApiUtil.getIntValue(player, PlayerAttachments.AFK_COOLDOWN);
-                if (!FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK) && Config.commandCooldown != 0 && cooldown > 0) {
-                    CommandUtil.sendFail(source, "You must wait " + (cooldown / 20) + "s before using this command again.");
+                if (!FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK) && Config.afkCommandCooldown.get() != 0 && cooldown > 0) {
+                    CommandUtil.sendFail(source, "[ServerTweaks] You must wait " + (cooldown / 20) + "s before using this command again.");
                     return 0;
                 }
 
@@ -49,17 +49,19 @@ public class Afk {
                 }
 
                 if (FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK)) {
-                    //Remove from team and set IS_aFK to false
+                    //Remove from team and set IS_AFK to false
                     scoreboard.removePlayerFromTeam(player.getScoreboardName(), team);
                     FdaApiUtil.setBoolValue(player, PlayerAttachments.IS_AFK, false);
 
                     //Reset command cooldown
-                    FdaApiUtil.setIntValue(player, PlayerAttachments.AFK_COOLDOWN, Config.commandCooldown);
+                    FdaApiUtil.setIntValue(player, PlayerAttachments.AFK_COOLDOWN, Config.afkCommandCooldown.get());
 
                     //If enabled, despawn
-                    if (Config.despawnMonsters && player.level() instanceof ServerLevel level) {
-                        despawnNearbyMonsters(player, level);
+                    if (Config.despawnMonsters.get()) {
+                        despawnNearbyMonsters(player);
                     }
+
+                    CommandUtil.sendSucc(source, "[ServerTweaks] You are no longer AFK.");
                 } else {
                     //Set position at which command was executed at
                     //Add to team and set IS_AFK to true
@@ -70,6 +72,8 @@ public class Afk {
 
                     scoreboard.addPlayerToTeam(player.getScoreboardName(), team);
                     FdaApiUtil.setBoolValue(player, PlayerAttachments.IS_AFK, true);
+
+                    CommandUtil.sendSucc(source, "[ServerTweaks] You are now AFK.");
                 }
 
                 return 1;
@@ -77,7 +81,8 @@ public class Afk {
         );
     }
 
-    private static void despawnNearbyMonsters(ServerPlayer player, ServerLevel level) {
+    private static void despawnNearbyMonsters(ServerPlayer player) {
+        ServerLevel level = player.level();
         if (level.isBrightOutside()) return;
         AABB box = new AABB(
             player.getX() - 8, player.getY() - 8, player.getZ() - 8,

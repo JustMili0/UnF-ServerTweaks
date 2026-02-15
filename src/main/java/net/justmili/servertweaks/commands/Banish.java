@@ -1,6 +1,7 @@
 package net.justmili.servertweaks.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.init.Dimensions;
 import net.justmili.servertweaks.util.CommandUtil;
 import net.minecraft.commands.CommandBuildContext;

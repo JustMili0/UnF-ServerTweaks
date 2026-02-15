@@ -10,7 +10,7 @@
   "contact": {},
   "license": "All-Rights-Reserved",
   "icon": "icon.png",
-  "environment": "server",
+  "environment": "*",
   "entrypoints": {
     "main": [
       "net.justmili.servertweaks.ServerTweaks"
@@ -22,6 +22,7 @@
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric-api": "*",
+    "supermartijn642configlib": "*",
     "minecraft": "${minecraft_version}"
   }
 }
