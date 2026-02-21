@@ -27,6 +27,11 @@ Allows the players to change their height (scale attribute) to e.g. their irl he
 
 Command also features some admin tools for unlocking, resetting etc. players' heights.
 </details>
+<details><summary>/duel (If Enabled) | Fun</summary>
+The command is enabled in the config, all PvP will be disabled, but players can still fight via the duel command.
+
+It exists to prevent unwanted PvP on servers that aren't too keen on it
+</details>
 <details>
 <summary>/daycount | Informative</summary>
 To get the tick-exact day count and game time of the server
@@ -55,9 +60,13 @@ A mixin to get rid of Anvil's "Too Expensive" limit.
 <summary>Never Too Fast</summary>
 Removed player movement limiters, essentially getting rid of "Player moved too fast!" warn
 </details>
+<details>
+<summary>Better Push Limit</summary>
+Allows the admin/owner to change the piston push limit in the mod config
+</details>
 
 <hr>
 
 ### Usage Permission
 You are not allowed to modify or/and redistribute the original code. You are allowed to distribute the mod in modpacks.<br>
-You are allowed to use the mod as an API/library for your own projects/addons as the mod provides a few useful util classes.
+The mod will soon move its resources, util classes and Libs/APIs to MysticLib so this mod will no longer be usable as a util library.
