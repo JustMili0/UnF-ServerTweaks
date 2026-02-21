@@ -1,0 +1,5 @@
+## 1.2.1+mc1.21.11 Changelog
+
+### ***BUG FIXES***
+- You can no longer `/duel` yourself
+- Duel request no longer get overwritten if a new one comes in

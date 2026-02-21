@@ -22,7 +22,11 @@ public class Duel {
                         ServerPlayer recipient = EntityArgument.getPlayer(context, "player");
                         ServerPlayer sender = context.getSource().getPlayer();
 
-                        // Added return statements so the request doesn't go through when already dueling
+                        //Prevent dueling yourself
+                        if (sender == recipient) {
+                            CommandUtil.sendTo(sender, "[ServerTweaks] You can not duel yourself.");
+                            return 0;
+                        }
                         if (FdaApiUtil.getBoolValue(sender, PlayerAttachments.IN_DUEL)) {
                             CommandUtil.sendTo(sender, "[ServerTweaks] You are already in a duel.");
                             return 0;
@@ -30,6 +34,12 @@ public class Duel {
                         if (FdaApiUtil.getBoolValue(recipient, PlayerAttachments.IN_DUEL)) {
                             CommandUtil.sendTo(sender, "[ServerTweaks] " + recipient.getName().getString() + " is already in a duel.");
                             return 0;
+                        }
+                        if (FdaApiUtil.getStringValue(recipient, PlayerAttachments.AWAITING_DUEL_SENDER) != null
+                            || FdaApiUtil.getStringValue(recipient, PlayerAttachments.AWAITING_DUEL_SENDER) != "val_inactive") {
+
+                            CommandUtil.sendTo(sender, "[ServerTweaks] " + recipient.getDisplayName() + " already has a pending duel request.");
+                            CommandUtil.sendTo(recipient, "[ServerTweaks] " + recipient.getDisplayName() + " tried to send a duel request but you already have one pending.");
                         }
 
                         CommandUtil.sendTo(sender, "[ServerTweaks] You've sent a duel request to " + recipient.getName().getString() + ".");
