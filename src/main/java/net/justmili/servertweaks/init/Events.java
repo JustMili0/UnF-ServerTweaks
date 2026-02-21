@@ -7,14 +7,17 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.justmili.servertweaks.mechanics.events.Banishment;
 import net.justmili.servertweaks.mechanics.events.ScaleConvert;
 import net.justmili.servertweaks.mechanics.events.WhileAfk;
+import net.justmili.servertweaks.mechanics.events.WhileDuel;
 
 public class Events {
     public static void register() {
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(Banishment::onEntityHurt);
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(WhileAfk::onEntityHurt);
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register(WhileDuel::onEntityHurt);
         ServerTickEvents.END_WORLD_TICK.register(Banishment::onWorldTick);
         ServerTickEvents.END_SERVER_TICK.register(WhileAfk::onServerTick);
         ServerEntityEvents.ENTITY_LOAD.register(Banishment::onEntityLoad);
         ServerPlayConnectionEvents.JOIN.register(ScaleConvert::onServerJoined);
+        ServerPlayConnectionEvents.DISCONNECT.register(WhileDuel::onPlayerDisconnect);
     }
 }

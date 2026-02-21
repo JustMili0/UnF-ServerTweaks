@@ -18,8 +18,8 @@ public class FdaApiUtil {
     public static String getStringValue(ServerPlayer player, AttachmentType<String> variable) {
         return getValue(player, variable, "ValueReturnedNull");
     }
-    public static void setStringValue(ServerPlayer player, AttachmentType<String> variable, String value) {
-        player.setAttached(variable, value);
+    public static void setStringValue(ServerPlayer player, AttachmentType<String> variable, String string) {
+        player.setAttached(variable, string);
     }
 
     //Numbers yay

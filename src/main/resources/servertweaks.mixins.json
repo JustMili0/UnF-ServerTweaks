@@ -4,8 +4,9 @@
   "package": "net.justmili.servertweaks.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "UncapSpeedLimits",
-    "RemoveAnvilLimit"
+    "BetterPushLimit",
+    "RemoveAnvilLimit",
+    "UncapSpeedLimits"
   ],
   "client": [
   ],

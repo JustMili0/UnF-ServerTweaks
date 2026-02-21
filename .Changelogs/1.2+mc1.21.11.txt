@@ -1,0 +1,12 @@
+## 1.2+mc1.21.11 Changelog
+
+### ***NEW CONTENT***
+- Now you can configure how many blocks a piston can push
+  - Default is 12, minimum is 0, maximum is 511
+- `/duel <player>` command (Disabled by default)
+  - __ENABLING THIS COMMAND WILL DISABLE PVP THROUGH `ALLOWS_DAMAGE` LIVING ENTITY EVENTS!__
+  - `/duel` a player you wish to fight. They can either `/duel accept` or `/duel decline`.
+  - One duel per 2 players can be going on at a time
+  - Can end duel with `/duel end`
+    - No damage can be taken within last 30s to end duel
+  - Can't enter a new duel until previous duel has ended

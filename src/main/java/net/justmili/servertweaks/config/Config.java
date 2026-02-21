@@ -9,7 +9,7 @@ public class Config {
     //Individual configs for each command.
     public static final Supplier<Boolean> enableAfkCommand;
     public static final Supplier<Boolean> enableScaleCommand;
-    ///public static final Supplier<Boolean> enableDuelCommand; //WIP Command
+    public static final Supplier<Boolean> enableDuelCommand;
     public static final Supplier<Boolean> enableDaycountCommand;
     public static final Supplier<Boolean> enableDamageToggleCommand;
     public static final Supplier<Boolean> enableBanishCommand;
@@ -25,9 +25,11 @@ public class Config {
 
     //Config for "RemoveAnvilLimit" mixin.
     public static final Supplier<Boolean> removeAnvilLimit;
+
+    //Config for "BetterPushLimit" mixin.
+    public static final Supplier<Integer> pistonPushLimit;
     
     static {
-        // construct a new config builder
         IConfigBuilder oldCfg = ConfigBuilders.newTomlConfig("servertweaks", "", false);
         oldCfg.comment("THIS CONFIG FILE IS NO LONGER SUPPORTED BY SERVERTWEAKS");
         IConfigBuilder builder = ConfigBuilders.newTomlConfig("servertweaks", "new", false);
@@ -36,7 +38,7 @@ public class Config {
         builder.comment("Should these commands be enabled on the server?");
         enableAfkCommand = builder.define("enableAfkCommand", true);
         enableScaleCommand = builder.define("enableScaleCommand", true);
-        ///enableDuelCommand = builder.define("enableDuelCommand", true);
+        enableDuelCommand = builder.define("enableDuelCommand", false);
         enableDaycountCommand = builder.define("enableDaycountCommand", true);
         enableDamageToggleCommand = builder.define("enableDamageToggleCommand", true);
         enableBanishCommand = builder.define("enableBanishCommand", true);
@@ -58,6 +60,8 @@ public class Config {
             .define("limitVehicleSpeed", true);
         removeAnvilLimit = builder.comment("Should the server clamp the max anvil cost to 39 levels if at or over, to prevent \"Too Expensive\"?")
             .define("removeAnvilLimit", true);
+        pistonPushLimit = builder.comment("How many blocks should the piston be able to push?")
+                .define("pistonPushLimit", 12, 0, 511);
         builder.pop();
 
         builder.build();

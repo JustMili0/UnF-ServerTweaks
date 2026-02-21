@@ -18,6 +18,9 @@ public class Commands {
                 DamageToggle.register(dispatcher, commandBuildContext, environment);
             if (CommandUtil.checkIfExpected(Config.enableBanishCommand, true))
                 Banish.register(dispatcher, commandBuildContext, environment);
+            if (CommandUtil.checkIfExpected(Config.enableDuelCommand, true))
+                Duel.register(dispatcher, commandBuildContext, environment);
+
         });
     }
 }
