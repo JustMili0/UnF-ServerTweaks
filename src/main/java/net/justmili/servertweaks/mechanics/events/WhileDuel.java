@@ -33,6 +33,13 @@ public class WhileDuel {
         return false;
     }
 
+    public static void onPlayerDeath(LivingEntity entity, DamageSource source) {
+        if (!(entity instanceof ServerPlayer player)) return;
+        if (!(source.getEntity() instanceof ServerPlayer opponent)) return;
+
+        if (FdaApiUtil.getBoolValue(player, PlayerAttachments.IN_DUEL)) endDuel(player, opponent);
+    }
+
     public static void onPlayerDisconnect(ServerGamePacketListenerImpl handler, MinecraftServer server) {
         ServerPlayer player = handler.getPlayer();
 

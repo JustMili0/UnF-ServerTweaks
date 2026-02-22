@@ -1,0 +1,7 @@
+## 1.2.1+mc1.21.11 Changelog
+
+### ***BUG FIXES***
+- Duel ends after someone dies
+  - I'm hoping it works because I'm writing this at 3 in the morning and don't have time to test it
+
+Yes that's literally it.
