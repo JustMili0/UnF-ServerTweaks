@@ -1,0 +1,6 @@
+Ideas:
+- Configurable friendly fire (pets)
+- /discard (entity, block, block/entity inventory)
+- Right-Click Harvest
+- Catify Players (makes creepers and phantoms scared of certain players, SillyMili and Flufaye by default)
+- Teleport requests maybe?
