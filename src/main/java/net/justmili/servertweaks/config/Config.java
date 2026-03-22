@@ -28,6 +28,9 @@ public class Config {
 
     //Config for "BetterPushLimit" mixin.
     public static final Supplier<Integer> pistonPushLimit;
+
+    //Config for "RightClickHarvest" feature.
+    public static final Supplier<Boolean> rightClickHarvest;
     
     static {
         IConfigBuilder oldCfg = ConfigBuilders.newTomlConfig("servertweaks", "", false);
@@ -62,6 +65,11 @@ public class Config {
             .define("removeAnvilLimit", true);
         pistonPushLimit = builder.comment("How many blocks should the piston be able to push?")
                 .define("pistonPushLimit", 12, 0, 511);
+        builder.pop();
+
+        builder.push("Features");
+        rightClickHarvest = builder.comment("Should the player be able to harvest crops with by just right-clicking?")
+                .define("rightClickHarvest", true);
         builder.pop();
 
         builder.build();

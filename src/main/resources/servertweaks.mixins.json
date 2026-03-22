@@ -6,7 +6,11 @@
   "mixins": [
     "BetterPushLimit",
     "RemoveAnvilLimit",
-    "UncapSpeedLimits"
+    "UncapSpeedLimits",
+    "abilities.ItemUseMixin",
+    "abilities.LivingEntityKnockbackMixin",
+    "abilities.PlayerAbilitiesMixin",
+    "accessors.CropBlockAccessor"
   ],
   "client": [
   ],

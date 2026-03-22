@@ -20,7 +20,7 @@ public class Commands {
                 Banish.register(dispatcher, commandBuildContext, environment);
             if (CommandUtil.checkIfExpected(Config.enableDuelCommand, true))
                 Duel.register(dispatcher, commandBuildContext, environment);
-
+            Discard.register(dispatcher, commandBuildContext, environment); // This command is not configurable.
         });
     }
 }

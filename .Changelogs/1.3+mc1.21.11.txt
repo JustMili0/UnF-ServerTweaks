@@ -1,6 +1,15 @@
-Ideas:
-- Configurable friendly fire (pets)
-- /discard (entity, block, block/entity inventory)
-- Right-Click Harvest
-- Catify Players (makes creepers and phantoms scared of certain players, SillyMili and Flufaye by default)
-- Teleport requests maybe?
+## 1.3+mc1.21.11 Changelog
+
+### ***NEW CONTENT***
+- `/discard <target>` command, allows operators discard entities, blocks, and clear inventories (of any entity/block)
+  - Entity discard - basically `/kill` without dropping loot or XP, just poof, and it's gone
+  - Block discard - basically `/setblock x y z minecraft:air` without specifying air and no items or anything else (like XP) drops from the block
+  - Inventory discard - basically `/clear` mixed with `/data` but much less complex
+- Right-Click-Harvest
+  - Yes fortune applies
+  - Larger affect area when using a hoe
+- Special Player Abilities (EXPERIMENTAL, IN TESTING)
+  - All abilities based on Minecraft mobs
+  - Can be configured to be disabled
+  - Player abilities can only be given by editing `servertweaks_abilities_config.dat` file in `\config\` FOR NOW
+    - A proper config add/remove for player abilities will be added once testing and experminets will be done
