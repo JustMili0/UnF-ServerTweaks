@@ -1,7 +1,7 @@
 package net.justmili.servertweaks.mixin.abilities;
 
 import net.justmili.servertweaks.mechanics.abilities.AbilityManager;
-import net.justmili.servertweaks.mechanics.abilities.sets.Abilities;
+import net.justmili.servertweaks.mechanics.abilities.AbilityRegistry;
 import net.justmili.servertweaks.mixin.abilities.context.PlayerContext;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -23,13 +23,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Mob.class)
 public class MobMixin {
+
     @Inject(method = "setTarget", at = @At("HEAD"), cancellable = true)
     private void servertweaks$setTarget(LivingEntity target, CallbackInfo ci) {
         if (!(target instanceof ServerPlayer sp)) return;
-        if (!AbilityManager.has(sp.getUUID(), Abilities.FRIENDS_WITH_NATURE)) return;
+        if (!AbilityManager.has(sp.getUUID(), AbilityRegistry.FRIENDS_WITH_NATURE)) return;
 
         Mob self = (Mob) (Object) this;
-
         if (self instanceof Wolf wolf && !wolf.isTame()) { ci.cancel(); return; }
         if (self instanceof Bee) { ci.cancel(); return; }
         if (self instanceof PolarBear) { ci.cancel(); return; }
@@ -41,19 +41,21 @@ public class MobMixin {
     @Inject(method = "setTarget", at = @At("HEAD"), cancellable = true)
     private void servertweaks$isMonsterSetTarget(LivingEntity target, CallbackInfo ci) {
         if (!(target instanceof ServerPlayer sp)) return;
-        if (!AbilityManager.has(sp.getUUID(), Abilities.IS_MONSTER)) return;
+        if (!AbilityManager.has(sp.getUUID(), AbilityRegistry.IS_MONSTER)) return;
 
         Mob self = (Mob) (Object) this;
         if (self instanceof Pillager) ci.cancel();
     }
 
     @Inject(method = "interact", at = @At("HEAD"))
-    private void servertweaks$setContext(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+    private void servertweaks$setContext(Player player, InteractionHand hand,
+                                         CallbackInfoReturnable<InteractionResult> cir) {
         if ((Object) this instanceof TamableAnimal) PlayerContext.set(player);
     }
 
     @Inject(method = "interact", at = @At("RETURN"))
-    private void servertweaks$clearContext(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
+    private void servertweaks$clearContext(Player player, InteractionHand hand,
+                                           CallbackInfoReturnable<InteractionResult> cir) {
         if ((Object) this instanceof TamableAnimal) PlayerContext.set(null);
     }
 }

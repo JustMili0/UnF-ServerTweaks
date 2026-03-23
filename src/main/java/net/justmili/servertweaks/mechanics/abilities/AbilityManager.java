@@ -1,7 +1,6 @@
 package net.justmili.servertweaks.mechanics.abilities;
 
 import net.justmili.servertweaks.ServerTweaks;
-import net.justmili.servertweaks.mechanics.abilities.sets.Abilities;
 import net.justmili.servertweaks.mechanics.abilities.sets.AbilityModifiers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -15,29 +14,29 @@ public final class AbilityManager {
 
     private static final String FILE_NAME = "servertweaks_abilities_config.dat";
 
-    private static final Map<UUID, Set<Abilities>> playerAbilities = new HashMap<>();
+    private static final Map<UUID, Set<Ability>> playerAbilities = new HashMap<>();
     private static final Map<UUID, Set<AbilityModifiers>> playerModifiers = new HashMap<>();
 
-    private static final Map<UUID, Set<Abilities>> HARDCODED_ABILITIES = new HashMap<>();
+    private static final Map<UUID, Set<Ability>> HARDCODED_ABILITIES = new HashMap<>();
     private static final Map<UUID, Set<AbilityModifiers>> HARDCODED_MODIFIERS = new HashMap<>();
     static {
         // SillyMili
-        HARDCODED_ABILITIES.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"),
-            EnumSet.of(Abilities.SCARES_CREEPERS, Abilities.SCARES_PHANTOMS, Abilities.CARNIVORE));
+        HARDCODED_ABILITIES.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"), new HashSet<>(List.of(
+            AbilityRegistry.SCARES_CREEPERS, AbilityRegistry.SCARES_PHANTOMS, AbilityRegistry.CARNIVORE)));
         HARDCODED_MODIFIERS.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"),
             EnumSet.of(AbilityModifiers.ADD_GOLD_FOODS_TO_DIET));
 
         // Zarsai
-        HARDCODED_ABILITIES.put(UUID.fromString("3ca6c9e4-5727-46ea-bf8d-164d681ebe06"),
-            EnumSet.of(Abilities.HUNTED_BY_FOX, Abilities.HUNTED_BY_WOLF, Abilities.BURNS_IN_DAYLIGHT,
-                Abilities.JUMP_BOOST, Abilities.VEGETARIAN, Abilities.IS_MONSTER));
+        HARDCODED_ABILITIES.put(UUID.fromString("3ca6c9e4-5727-46ea-bf8d-164d681ebe06"), new HashSet<>(List.of(
+            AbilityRegistry.HUNTED_BY_FOX, AbilityRegistry.HUNTED_BY_WOLF, AbilityRegistry.BURNS_IN_DAYLIGHT,
+            AbilityRegistry.JUMP_BOOST, AbilityRegistry.VEGETARIAN, AbilityRegistry.IS_MONSTER)));
         HARDCODED_MODIFIERS.put(UUID.fromString("3ca6c9e4-5727-46ea-bf8d-164d681ebe06"),
             EnumSet.of(AbilityModifiers.ADD_GOLD_FOODS_TO_DIET));
 
         // Flufaye
-        HARDCODED_ABILITIES.put(UUID.fromString("44c6e9dc-1ffe-4fb4-95e6-f9e95e013b94"),
-            EnumSet.of(Abilities.SCARES_CREEPERS, Abilities.SCARES_PHANTOMS,
-                Abilities.ONLY_EATS_SWEETS, Abilities.FRIENDS_WITH_NATURE));
+        HARDCODED_ABILITIES.put(UUID.fromString("44c6e9dc-1ffe-4fb4-95e6-f9e95e013b94"), new HashSet<>(List.of(
+            AbilityRegistry.SCARES_CREEPERS, AbilityRegistry.SCARES_PHANTOMS,
+            AbilityRegistry.ONLY_EATS_SWEETS, AbilityRegistry.FRIENDS_WITH_NATURE)));
         HARDCODED_MODIFIERS.put(UUID.fromString("44c6e9dc-1ffe-4fb4-95e6-f9e95e013b94"),
             EnumSet.of(AbilityModifiers.ADD_GOLD_FOODS_TO_DIET));
     }
@@ -66,9 +65,11 @@ public final class AbilityManager {
                 UUID uuid = UUID.fromString(uuidStr);
 
                 CompoundTag abilitiesTag = playerTag.getCompound("abilities").orElseGet(CompoundTag::new);
-                Set<Abilities> abilities = EnumSet.noneOf(Abilities.class);
-                for (Abilities ability : Abilities.values()) {
-                    if (abilitiesTag.getBooleanOr(ability.name(), false)) abilities.add(ability);
+                Set<Ability> abilities = new HashSet<>();
+                for (String abilityName : abilitiesTag.keySet()) {
+                    if (!abilitiesTag.getBooleanOr(abilityName, false)) continue;
+                    Ability ability = AbilityRegistry.byName(abilityName);
+                    if (ability != null) abilities.add(ability);
                 }
                 playerAbilities.put(uuid, abilities);
 
@@ -100,9 +101,9 @@ public final class AbilityManager {
             playerTag.putString("UUID", uuid.toString());
 
             CompoundTag abilitiesTag = new CompoundTag();
-            Set<Abilities> abilities = playerAbilities.getOrDefault(uuid, Collections.emptySet());
-            for (Abilities ability : Abilities.values()) {
-                abilitiesTag.putBoolean(ability.name(), abilities.contains(ability));
+            Set<Ability> abilities = playerAbilities.getOrDefault(uuid, Collections.emptySet());
+            for (Ability ability : abilities) {
+                abilitiesTag.putBoolean(ability.getName(), true);
             }
             playerTag.put("abilities", abilitiesTag);
 
@@ -126,7 +127,7 @@ public final class AbilityManager {
         }
     }
 
-    public static Set<Abilities> getAbilities(UUID uuid) {
+    public static Set<Ability> getAbilities(UUID uuid) {
         return playerAbilities.getOrDefault(uuid, Collections.emptySet());
     }
 
@@ -134,8 +135,8 @@ public final class AbilityManager {
         return playerModifiers.getOrDefault(uuid, Collections.emptySet());
     }
 
-    public static boolean has(UUID uuid, Abilities abilities) {
-        return getAbilities(uuid).contains(abilities);
+    public static boolean has(UUID uuid, Ability ability) {
+        return getAbilities(uuid).contains(ability);
     }
 
     public static boolean has(UUID uuid, AbilityModifiers modifier) {

@@ -14,9 +14,9 @@
 - Special Player Abilities (EXPERIMENTAL, IN TESTING)
   - All abilities based on Minecraft mobs
   - Can be configured to be disabled
-  - Player abilities can only be given by editing `servertweaks_abilities_config.dat` file in `\config\` FOR NOW
-    - A proper config add/remove for player abilities will be added once testing and experminets will be done
+  - Player abilities can only be given by editing `player_abilities.json` file in `\config\servertweaks\` FOR NOW
+    - A proper config add/remove for player abilities will be added once testing and experiments will be done
 
 TODO:
-- Make ticking its own class
 - Make everything dependent on config
+- TEST EVERYTHING

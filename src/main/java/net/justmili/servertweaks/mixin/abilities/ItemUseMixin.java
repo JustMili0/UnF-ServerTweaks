@@ -17,16 +17,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Item.class)
 public class ItemUseMixin {
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
-    private void servertweaks$use(Level level, Player player, InteractionHand hand,
-                                  CallbackInfoReturnable<InteractionResult> cir) {
+    private void servertweaks$use(Level level, Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {
         if (level.isClientSide()) return;
         if (!(player instanceof ServerPlayer sp)) return;
-
         ItemStack stack = player.getItemInHand(hand);
         if (!stack.has(DataComponents.FOOD)) return;
-
-        if (!AbilityEffects.onItemUse(sp, stack)) {
-            cir.setReturnValue(InteractionResult.FAIL);
-        }
+        if (!AbilityEffects.onItemUse(sp, stack)) cir.setReturnValue(InteractionResult.FAIL);
     }
 }
