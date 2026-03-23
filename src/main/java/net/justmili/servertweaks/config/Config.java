@@ -31,11 +31,10 @@ public class Config {
 
     //Config for "RightClickHarvest" feature.
     public static final Supplier<Boolean> rightClickHarvest;
+    public static final Supplier<Boolean> playerAbilities;
     
     static {
-        IConfigBuilder oldCfg = ConfigBuilders.newTomlConfig("servertweaks", "", false);
-        oldCfg.comment("THIS CONFIG FILE IS NO LONGER SUPPORTED BY SERVERTWEAKS");
-        IConfigBuilder builder = ConfigBuilders.newTomlConfig("servertweaks", "new", false);
+        IConfigBuilder builder = ConfigBuilders.newTomlConfig("servertweaks", null, true);
 
         builder.push("Commands");
         builder.comment("Should these commands be enabled on the server?");
@@ -70,6 +69,8 @@ public class Config {
         builder.push("Features");
         rightClickHarvest = builder.comment("Should the player be able to harvest crops with by just right-clicking?")
                 .define("rightClickHarvest", true);
+        playerAbilities = builder.comment("[EXPERIMENTAL] Allows server owners to configure player abilities for some or all members")
+            .define("playerAbilities", false);
         builder.pop();
 
         builder.build();

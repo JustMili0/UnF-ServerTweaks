@@ -1,8 +1,8 @@
 package net.justmili.servertweaks.mixin.abilities;
 
-import net.justmili.servertweaks.mechanics.abilities.Ability;
 import net.justmili.servertweaks.mechanics.abilities.AbilityEffects;
 import net.justmili.servertweaks.mechanics.abilities.AbilityManager;
+import net.justmili.servertweaks.mechanics.abilities.sets.Abilities;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
-public class PlayerAbilitiesMixin {
+public class PlayerMixin {
     @Inject(method = "onClimbable", at = @At("RETURN"), cancellable = true)
     private void servertweaks$onClimbable(CallbackInfoReturnable<Boolean> cir) {
         Player self = (Player) (Object) this;
@@ -27,7 +27,7 @@ public class PlayerAbilitiesMixin {
     private void servertweaks$attack(Entity target, CallbackInfo ci) {
         Player self = (Player) (Object) this;
         if (!(self instanceof ServerPlayer sp)) return;
-        if (! AbilityManager.has(sp.getUUID(), Ability.STRONG)) return;
+        if (!AbilityManager.has(sp.getUUID(), Abilities.STRONG)) return;
         if (target instanceof LivingEntity living) {
             living.hurt(sp.level().damageSources().playerAttack(sp), 4.0F);
         }

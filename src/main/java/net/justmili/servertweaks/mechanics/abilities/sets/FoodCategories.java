@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.mechanics.abilities;
+package net.justmili.servertweaks.mechanics.abilities.sets;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -21,7 +21,6 @@ public final class FoodCategories {
         Items.ROTTEN_FLESH
     );
 
-    // Plant-based foods + milk + honey (vegetarian-friendly)
     public static final Set<Item> VEGETARIAN = Set.of(
         Items.BREAD,
         Items.CARROT,
@@ -64,20 +63,17 @@ public final class FoodCategories {
         Items.GOLDEN_CARROT
     );
 
-    // Returns true if the player with these abilities is allowed to eat this item
-    public static boolean canEat(Set<Ability> abilities, Item item) {
-        // If no diet ability is present, no restrictions
-        boolean hasDiet = abilities.contains(Ability.CARNIVORE)
-            || abilities.contains(Ability.VEGETARIAN)
-            || abilities.contains(Ability.ONLY_EATS_SWEETS);
+    public static boolean canEat(Set<Abilities> abilities, Set<AbilityModifiers> modifiers, Item item) {
+        boolean hasDiet = abilities.contains(Abilities.CARNIVORE)
+            || abilities.contains(Abilities.VEGETARIAN)
+            || abilities.contains(Abilities.ONLY_EATS_SWEETS);
         if (!hasDiet) return true;
 
-        // Golden modifier adds golden foods to the allowed list regardless of diet
-        if (abilities.contains(Ability.MODIFIER_EDIBLE_GOLDEN_FOODS) && GOLDEN_FOODS.contains(item)) return true;
+        if (modifiers.contains(AbilityModifiers.ADD_GOLD_FOODS_TO_DIET) && GOLDEN_FOODS.contains(item)) return true;
 
-        if (abilities.contains(Ability.CARNIVORE)) return MEAT.contains(item);
-        if (abilities.contains(Ability.VEGETARIAN)) return VEGETARIAN.contains(item);
-        if (abilities.contains(Ability.ONLY_EATS_SWEETS)) return SWEETS.contains(item);
+        if (abilities.contains(Abilities.CARNIVORE)) return MEAT.contains(item);
+        if (abilities.contains(Abilities.VEGETARIAN)) return VEGETARIAN.contains(item);
+        if (abilities.contains(Abilities.ONLY_EATS_SWEETS)) return SWEETS.contains(item);
 
         return true;
     }

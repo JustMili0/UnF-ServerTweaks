@@ -1,5 +1,8 @@
 package net.justmili.servertweaks.mechanics.abilities;
 
+import net.justmili.servertweaks.mechanics.abilities.sets.Abilities;
+import net.justmili.servertweaks.mechanics.abilities.sets.AbilityModifiers;
+import net.justmili.servertweaks.mechanics.abilities.sets.FoodCategories;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -36,7 +39,7 @@ public final class AbilityEffects {
     public static void onWorldTick(ServerLevel level) {
         for (ServerPlayer player : level.players()) {
             UUID uuid = player.getUUID();
-            Set<Ability> abilities = AbilityManager.getAbilities(uuid);
+            Set<Abilities> abilities = AbilityManager.getAbilities(uuid);
             if (abilities.isEmpty()) continue;
 
             tickBurnsInDaylight(player, level, abilities);
@@ -51,13 +54,14 @@ public final class AbilityEffects {
             tickAttractsBees(player, level, abilities);
             tickHatesWater(player, level, abilities);
             tickStrong(player, abilities);
+            tickIsMonster(player, level, abilities);
         }
     }
 
     public static boolean onAllowDamage(ServerPlayer player, DamageSource source, float amount) {
-        Set<Ability> abilities = AbilityManager.getAbilities(player.getUUID());
+        Set<Abilities> abilities = AbilityManager.getAbilities(player.getUUID());
 
-        if (abilities.contains(Ability.FIRE_IMMUNE)) {
+        if (abilities.contains(Abilities.FIRE_IMMUNE)) {
             if (source.is(DamageTypes.IN_FIRE)
                 || source.is(DamageTypes.ON_FIRE)
                 || source.is(DamageTypes.LAVA)
@@ -66,16 +70,16 @@ public final class AbilityEffects {
             }
         }
 
-        if (abilities.contains(Ability.FALL_IMMUNE)) {
-            if (source.is(DamageTypes.FALL)) {
-                return false;
-            }
+        if (abilities.contains(Abilities.FALL_IMMUNE)) {
+            if (source.is(DamageTypes.FALL)) return false;
         }
 
-        if (abilities.contains(Ability.BREATHES_UNDERWATER)) {
-            if (source.is(DamageTypes.DROWN)) {
-                return false;
-            }
+        if (abilities.contains(Abilities.BREATHES_UNDERWATER)) {
+            if (source.is(DamageTypes.DROWN)) return false;
+        }
+
+        if (abilities.contains(Abilities.FREEZE_IMMUNE)) {
+            if (source.is(DamageTypes.FREEZE)) return false;
         }
 
         return true;
@@ -86,8 +90,8 @@ public final class AbilityEffects {
         if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
         if (!(player instanceof ServerPlayer sp)) return InteractionResult.PASS;
 
-        Set<Ability> abilities = AbilityManager.getAbilities(sp.getUUID());
-        if (!abilities.contains(Ability.CAN_FEED_FROM_GRASS)) return InteractionResult.PASS;
+        Set<Abilities> abilities = AbilityManager.getAbilities(sp.getUUID());
+        if (!abilities.contains(Abilities.CAN_FEED_FROM_GRASS)) return InteractionResult.PASS;
 
         BlockPos pos = hit.getBlockPos();
         if (!level.getBlockState(pos).is(Blocks.SHORT_GRASS)) return InteractionResult.PASS;
@@ -103,13 +107,14 @@ public final class AbilityEffects {
     // Returns false to cancel eating
     public static boolean onItemUse(ServerPlayer player, ItemStack stack) {
         if (!stack.has(DataComponents.FOOD)) return true;
-        Set<Ability> abilities = AbilityManager.getAbilities(player.getUUID());
-        return FoodCategories.canEat(abilities, stack.getItem());
+        Set<Abilities> abilities = AbilityManager.getAbilities(player.getUUID());
+        Set<AbilityModifiers> modifiers = AbilityManager.getModifiers(player.getUUID());
+        return FoodCategories.canEat(abilities, modifiers, stack.getItem());
     }
 
     // Returns true if the player should be climbing right now
     public static boolean shouldClimb(ServerPlayer player) {
-        if (!AbilityManager.has(player.getUUID(), Ability.CLIMBS_WALLS)) return false;
+        if (!AbilityManager.has(player.getUUID(), Abilities.CLIMBS_WALLS)) return false;
         if (player.onGround()) return false;
         Level level = player.level();
         BlockPos pos = player.blockPosition();
@@ -120,66 +125,58 @@ public final class AbilityEffects {
     }
 
     public static void updateStrongHealth(ServerPlayer player) {
-        if (!AbilityManager.has(player.getUUID(), Ability.STRONG)) return;
+        if (!AbilityManager.has(player.getUUID(), Abilities.STRONG)) return;
 
-        int armor = player.getArmorValue(); // 0 (naked) to 20 (full netherite)
+        int armor = player.getArmorValue();
         // Linear scale: 0 armor = 100HP, 20 armor = 40HP
         float maxHp = Math.max(40.0F, Math.min(100.0F, 100.0F - (armor * 3.0F)));
 
-        player.getAttribute(Attributes.MAX_HEALTH)
-            .setBaseValue(maxHp);
+        player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
         if (player.getHealth() > maxHp) player.setHealth(maxHp);
     }
 
-    private static void tickBurnsInDaylight(ServerPlayer player, ServerLevel level, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.BURNS_IN_DAYLIGHT)) return;
+    private static void tickBurnsInDaylight(ServerPlayer player, ServerLevel level, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.BURNS_IN_DAYLIGHT)) return;
         if (!level.isBrightOutside() || !level.canSeeSky(player.blockPosition())) return;
 
         int skyLight = level.getBrightness(LightLayer.SKY, player.blockPosition());
         if (skyLight <= 8) return;
 
-        // HEAD slot = helmet
         boolean hasHelmet = !player.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
         if (hasHelmet) return;
 
-        boolean inWater = player.isInWater();
-        if (inWater) {
-            if (level.getGameTime() % 30 == 0) {
-                player.hurt(level.damageSources().inFire(), 0.5F);
-            }
+        if (player.isInWater()) {
+            if (level.getGameTime() % 30 == 0) player.hurt(level.damageSources().inFire(), 0.5F);
         } else {
             player.setSharedFlagOnFire(true);
             player.setRemainingFireTicks(8);
         }
     }
 
-    private static void tickNightVision(ServerPlayer player, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.NIGHT_VISION)) return;
+    private static void tickNightVision(ServerPlayer player, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.NIGHT_VISION)) return;
         if (player.level().getGameTime() % 100 == 0) {
-            player.addEffect(new MobEffectInstance(
-                MobEffects.NIGHT_VISION, 300, 0, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0, false, false));
         }
     }
 
-    private static void tickJumpBoost(ServerPlayer player, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.JUMP_BOOST)) return;
+    private static void tickJumpBoost(ServerPlayer player, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.JUMP_BOOST)) return;
         if (player.level().getGameTime() % 100 == 0) {
-            player.addEffect(new MobEffectInstance(
-                MobEffects.JUMP_BOOST, 300, 0, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 300, 0, false, false));
         }
     }
 
-    private static void tickSpeedInWater(ServerPlayer player, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.SPEED_IN_WATER)) return;
+    private static void tickSpeedInWater(ServerPlayer player, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.SPEED_IN_WATER)) return;
         if (!player.isInWater()) return;
         if (player.level().getGameTime() % 100 == 0) {
-            player.addEffect(new MobEffectInstance(
-                MobEffects.DOLPHINS_GRACE, 300, 0, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 300, 0, false, false));
         }
     }
 
-    private static void tickScareCreepers(ServerPlayer player, ServerLevel level, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.SCARES_CREEPERS)) return;
+    private static void tickScareCreepers(ServerPlayer player, ServerLevel level, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.SCARES_CREEPERS)) return;
         List<Creeper> nearby = level.getEntitiesOfClass(Creeper.class, player.getBoundingBox().inflate(6.0));
         for (Creeper creeper : nearby) {
             creeper.setTarget(null);
@@ -190,8 +187,8 @@ public final class AbilityEffects {
         }
     }
 
-    private static void tickScarePhantoms(ServerPlayer player, ServerLevel level, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.SCARES_PHANTOMS)) return;
+    private static void tickScarePhantoms(ServerPlayer player, ServerLevel level, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.SCARES_PHANTOMS)) return;
         List<Phantom> nearby = level.getEntitiesOfClass(Phantom.class, player.getBoundingBox().inflate(16.0));
         for (Phantom phantom : nearby) {
             phantom.setTarget(null);
@@ -202,8 +199,8 @@ public final class AbilityEffects {
         }
     }
 
-    private static void tickFearedByPiglins(ServerPlayer player, ServerLevel level, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.FEARED_BY_PIGLINS)) return;
+    private static void tickFearedByPiglins(ServerPlayer player, ServerLevel level, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.FEARED_BY_PIGLINS)) return;
         List<Piglin> nearby = level.getEntitiesOfClass(Piglin.class, player.getBoundingBox().inflate(8.0));
         for (Piglin piglin : nearby) {
             if (!piglin.isAdult()) continue;
@@ -215,8 +212,8 @@ public final class AbilityEffects {
         }
     }
 
-    private static void tickHuntedByFox(ServerPlayer player, ServerLevel level, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.HUNTED_BY_FOX)) return;
+    private static void tickHuntedByFox(ServerPlayer player, ServerLevel level, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.HUNTED_BY_FOX)) return;
         List<Fox> nearby = level.getEntitiesOfClass(Fox.class, player.getBoundingBox().inflate(16.0));
         for (Fox fox : nearby) {
             if (fox.getTarget() != null) continue;
@@ -224,8 +221,8 @@ public final class AbilityEffects {
         }
     }
 
-    private static void tickHuntedByWolf(ServerPlayer player, ServerLevel level, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.HUNTED_BY_WOLF)) return;
+    private static void tickHuntedByWolf(ServerPlayer player, ServerLevel level, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.HUNTED_BY_WOLF)) return;
         List<Wolf> nearby = level.getEntitiesOfClass(Wolf.class, player.getBoundingBox().inflate(16.0));
         for (Wolf wolf : nearby) {
             if (wolf.isTame()) continue;
@@ -233,8 +230,8 @@ public final class AbilityEffects {
         }
     }
 
-    private static void tickAttractsBees(ServerPlayer player, ServerLevel level, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.ATTRACTS_BEES)) return;
+    private static void tickAttractsBees(ServerPlayer player, ServerLevel level, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.ATTRACTS_BEES)) return;
         List<Bee> nearby = level.getEntitiesOfClass(Bee.class, player.getBoundingBox().inflate(10.0));
         for (Bee bee : nearby) {
             if (bee.getTarget() != null) continue;
@@ -242,8 +239,8 @@ public final class AbilityEffects {
         }
     }
 
-    private static void tickHatesWater(ServerPlayer player, ServerLevel level, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.HATES_WATER)) return;
+    private static void tickHatesWater(ServerPlayer player, ServerLevel level, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.HATES_WATER)) return;
         boolean inWaterOrRain = player.isInWater()
             || (level.isRaining() && level.canSeeSky(player.blockPosition()));
         if (inWaterOrRain && level.getGameTime() % 20 == 0) {
@@ -251,8 +248,17 @@ public final class AbilityEffects {
         }
     }
 
-    private static void tickStrong(ServerPlayer player, Set<Ability> abilities) {
-        if (!abilities.contains(Ability.STRONG)) return;
+    private static void tickStrong(ServerPlayer player, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.STRONG)) return;
         if (player.level().getGameTime() % 10 == 0) updateStrongHealth(player);
+    }
+
+    private static void tickIsMonster(ServerPlayer player, ServerLevel level, Set<Abilities> abilities) {
+        if (!abilities.contains(Abilities.IS_MONSTER)) return;
+        List<net.minecraft.world.entity.animal.golem.IronGolem> golems = level.getEntitiesOfClass(
+            net.minecraft.world.entity.animal.golem.IronGolem.class, player.getBoundingBox().inflate(16.0));
+        for (net.minecraft.world.entity.animal.golem.IronGolem golem : golems) {
+            if (golem.getTarget() == null) golem.setTarget(player);
+        }
     }
 }

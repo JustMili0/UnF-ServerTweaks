@@ -1,9 +1,10 @@
-package net.justmili.servertweaks.mechanics.abilities;
+package net.justmili.servertweaks.mechanics.abilities.sets;
 
-public enum Ability {
+public enum Abilities {
     // Undead/Burning
     BURNS_IN_DAYLIGHT,
     FIRE_IMMUNE,
+    FREEZE_IMMUNE,
 
     // Movement
     FALL_IMMUNE,
@@ -25,11 +26,12 @@ public enum Ability {
     NIGHT_VISION,
     HATES_WATER,
     ATTRACTS_BEES,
+    FRIENDS_WITH_NATURE,
+    IS_MONSTER,
 
     // Diet
     CARNIVORE,
     VEGETARIAN,
     ONLY_EATS_SWEETS,
-    MODIFIER_EDIBLE_GOLDEN_FOODS,
     CAN_FEED_FROM_GRASS
 }

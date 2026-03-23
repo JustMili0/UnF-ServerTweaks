@@ -1,6 +1,8 @@
 package net.justmili.servertweaks.mechanics.abilities;
 
 import net.justmili.servertweaks.ServerTweaks;
+import net.justmili.servertweaks.mechanics.abilities.sets.Abilities;
+import net.justmili.servertweaks.mechanics.abilities.sets.AbilityModifiers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
@@ -11,35 +13,43 @@ import java.util.*;
 
 public final class AbilityManager {
 
-    // config/servertweaks_abilities_config.dat
     private static final String FILE_NAME = "servertweaks_abilities_config.dat";
 
-    // In-memory store: UUID -> set of active abilities
-    private static final Map<UUID, Set<Ability>> playerAbilities = new HashMap<>();
+    private static final Map<UUID, Set<Abilities>> playerAbilities = new HashMap<>();
+    private static final Map<UUID, Set<AbilityModifiers>> playerModifiers = new HashMap<>();
 
-    // Hardcoded defaults applied on load if the player has no entry yet
-    private static final Map<UUID, Set<Ability>> HARDCODED = new HashMap<>();
+    private static final Map<UUID, Set<Abilities>> HARDCODED_ABILITIES = new HashMap<>();
+    private static final Map<UUID, Set<AbilityModifiers>> HARDCODED_MODIFIERS = new HashMap<>();
     static {
-        HARDCODED.put(
-            UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"), // SillyMili
-            EnumSet.of(Ability.SCARES_CREEPERS, Ability.SCARES_PHANTOMS, Ability.CARNIVORE, Ability.MODIFIER_EDIBLE_GOLDEN_FOODS)
-        );
-        HARDCODED.put(
-            UUID.fromString("3ca6c9e4-5727-46ea-bf8d-164d681ebe06"), // Zarsai
-            EnumSet.of(Ability.HUNTED_BY_FOX, Ability.HUNTED_BY_WOLF, Ability.BURNS_IN_DAYLIGHT, Ability.JUMP_BOOST, Ability.VEGETARIAN, Ability.MODIFIER_EDIBLE_GOLDEN_FOODS)
-        );
-        HARDCODED.put(
-            UUID.fromString("44c6e9dc-1ffe-4fb4-95e6-f9e95e013b94"), // Flufaye
-            EnumSet.of(Ability.SCARES_CREEPERS, Ability.SCARES_PHANTOMS, Ability.ONLY_EATS_SWEETS, Ability.MODIFIER_EDIBLE_GOLDEN_FOODS)
-        );
+        // SillyMili
+        HARDCODED_ABILITIES.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"),
+            EnumSet.of(Abilities.SCARES_CREEPERS, Abilities.SCARES_PHANTOMS, Abilities.CARNIVORE));
+        HARDCODED_MODIFIERS.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"),
+            EnumSet.of(AbilityModifiers.ADD_GOLD_FOODS_TO_DIET));
+
+        // Zarsai
+        HARDCODED_ABILITIES.put(UUID.fromString("3ca6c9e4-5727-46ea-bf8d-164d681ebe06"),
+            EnumSet.of(Abilities.HUNTED_BY_FOX, Abilities.HUNTED_BY_WOLF, Abilities.BURNS_IN_DAYLIGHT,
+                Abilities.JUMP_BOOST, Abilities.VEGETARIAN, Abilities.IS_MONSTER));
+        HARDCODED_MODIFIERS.put(UUID.fromString("3ca6c9e4-5727-46ea-bf8d-164d681ebe06"),
+            EnumSet.of(AbilityModifiers.ADD_GOLD_FOODS_TO_DIET));
+
+        // Flufaye
+        HARDCODED_ABILITIES.put(UUID.fromString("44c6e9dc-1ffe-4fb4-95e6-f9e95e013b94"),
+            EnumSet.of(Abilities.SCARES_CREEPERS, Abilities.SCARES_PHANTOMS,
+                Abilities.ONLY_EATS_SWEETS, Abilities.FRIENDS_WITH_NATURE));
+        HARDCODED_MODIFIERS.put(UUID.fromString("44c6e9dc-1ffe-4fb4-95e6-f9e95e013b94"),
+            EnumSet.of(AbilityModifiers.ADD_GOLD_FOODS_TO_DIET));
     }
 
     public static void load(MinecraftServer server) {
         playerAbilities.clear();
+        playerModifiers.clear();
 
         File file = getFile(server);
         if (!file.exists()) {
-            playerAbilities.putAll(HARDCODED);
+            playerAbilities.putAll(HARDCODED_ABILITIES);
+            playerModifiers.putAll(HARDCODED_MODIFIERS);
             ServerTweaks.LOGGER.info("[AbilityManager] No .dat file found, using hardcoded defaults.");
             return;
         }
@@ -54,19 +64,24 @@ public final class AbilityManager {
                 String uuidStr = playerTag.getString("UUID").orElse(null);
                 if (uuidStr == null) continue;
                 UUID uuid = UUID.fromString(uuidStr);
-                CompoundTag abilitiesTag = playerTag.getCompound("abilities").orElseGet(CompoundTag::new);
 
-                Set<Ability> abilities = EnumSet.noneOf(Ability.class);
-                for (Ability ability : Ability.values()) {
-                    if (abilitiesTag.getBooleanOr(ability.name(), false)) {
-                        abilities.add(ability);
-                    }
+                CompoundTag abilitiesTag = playerTag.getCompound("abilities").orElseGet(CompoundTag::new);
+                Set<Abilities> abilities = EnumSet.noneOf(Abilities.class);
+                for (Abilities ability : Abilities.values()) {
+                    if (abilitiesTag.getBooleanOr(ability.name(), false)) abilities.add(ability);
                 }
                 playerAbilities.put(uuid, abilities);
+
+                CompoundTag modifiersTag = playerTag.getCompound("modifiers").orElseGet(CompoundTag::new);
+                Set<AbilityModifiers> modifiers = EnumSet.noneOf(AbilityModifiers.class);
+                for (AbilityModifiers modifier : AbilityModifiers.values()) {
+                    if (modifiersTag.getBooleanOr(modifier.name(), false)) modifiers.add(modifier);
+                }
+                playerModifiers.put(uuid, modifiers);
             }
 
-            // Hardcoded entries override file entries for the specific UUIDs
-            playerAbilities.putAll(HARDCODED);
+            playerAbilities.putAll(HARDCODED_ABILITIES);
+            playerModifiers.putAll(HARDCODED_MODIFIERS);
 
             ServerTweaks.LOGGER.info("[AbilityManager] Loaded abilities for {} player(s).", playerAbilities.size());
         } catch (IOException e) {
@@ -77,19 +92,27 @@ public final class AbilityManager {
     public static void save(MinecraftServer server) {
         CompoundTag root = new CompoundTag();
 
-        for (Map.Entry<UUID, Set<Ability>> entry : playerAbilities.entrySet()) {
-            UUID uuid = entry.getKey();
-            Set<Ability> abilities = entry.getValue();
+        Set<UUID> allUuids = new HashSet<>(playerAbilities.keySet());
+        allUuids.addAll(playerModifiers.keySet());
 
-            // Use UUID as compound key since we don't track names here
+        for (UUID uuid : allUuids) {
             CompoundTag playerTag = new CompoundTag();
             playerTag.putString("UUID", uuid.toString());
 
             CompoundTag abilitiesTag = new CompoundTag();
-            for (Ability ability : Ability.values()) {
+            Set<Abilities> abilities = playerAbilities.getOrDefault(uuid, Collections.emptySet());
+            for (Abilities ability : Abilities.values()) {
                 abilitiesTag.putBoolean(ability.name(), abilities.contains(ability));
             }
             playerTag.put("abilities", abilitiesTag);
+
+            CompoundTag modifiersTag = new CompoundTag();
+            Set<AbilityModifiers> modifiers = playerModifiers.getOrDefault(uuid, Collections.emptySet());
+            for (AbilityModifiers modifier : AbilityModifiers.values()) {
+                modifiersTag.putBoolean(modifier.name(), modifiers.contains(modifier));
+            }
+            playerTag.put("modifiers", modifiersTag);
+
             root.put(uuid.toString(), playerTag);
         }
 
@@ -97,22 +120,29 @@ public final class AbilityManager {
             File file = getFile(server);
             file.getParentFile().mkdirs();
             NbtIo.write(root, file.toPath());
-            ServerTweaks.LOGGER.info("[AbilityManager] Saved abilities for {} player(s).", playerAbilities.size());
+            ServerTweaks.LOGGER.info("[AbilityManager] Saved abilities for {} player(s).", allUuids.size());
         } catch (IOException e) {
             ServerTweaks.LOGGER.error("[AbilityManager] Failed to save .dat file: {}", e.getMessage());
         }
     }
 
-    // Returns the ability set for a player, or empty set if they have no entry
-    public static Set<Ability> getAbilities(UUID uuid) {
+    public static Set<Abilities> getAbilities(UUID uuid) {
         return playerAbilities.getOrDefault(uuid, Collections.emptySet());
     }
 
-    public static boolean has(UUID uuid, Ability ability) {
-        return getAbilities(uuid).contains(ability);
+    public static Set<AbilityModifiers> getModifiers(UUID uuid) {
+        return playerModifiers.getOrDefault(uuid, Collections.emptySet());
+    }
+
+    public static boolean has(UUID uuid, Abilities abilities) {
+        return getAbilities(uuid).contains(abilities);
+    }
+
+    public static boolean has(UUID uuid, AbilityModifiers modifier) {
+        return getModifiers(uuid).contains(modifier);
     }
 
     private static File getFile(MinecraftServer server) {
-        return new File(server.getServerDirectory().toFile(), "config/" + FILE_NAME);
+        return new File(server.getServerDirectory().toFile(), "config/servertweaks/" + FILE_NAME);
     }
 }

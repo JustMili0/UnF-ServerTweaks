@@ -1,5 +1,8 @@
 ## 1.3+mc1.21.11 Changelog
 
+### ***CONFIGURATION***
+- Configuration file has been moved to `\config\servertweaks\` directory. Previous configuration files won't be used anymore
+
 ### ***NEW CONTENT***
 - `/discard <target>` command, allows operators discard entities, blocks, and clear inventories (of any entity/block)
   - Entity discard - basically `/kill` without dropping loot or XP, just poof, and it's gone
@@ -13,3 +16,7 @@
   - Can be configured to be disabled
   - Player abilities can only be given by editing `servertweaks_abilities_config.dat` file in `\config\` FOR NOW
     - A proper config add/remove for player abilities will be added once testing and experminets will be done
+
+TODO:
+- Make ticking its own class
+- Make everything dependent on config

@@ -6,11 +6,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.justmili.servertweaks.mechanics.abilities.AbilityEffects;
-import net.justmili.servertweaks.mechanics.events.Banishment;
-import net.justmili.servertweaks.mechanics.events.RightClickHarvest;
-import net.justmili.servertweaks.mechanics.events.ScaleConvert;
-import net.justmili.servertweaks.mechanics.events.WhileAfk;
-import net.justmili.servertweaks.mechanics.events.WhileDuel;
+import net.justmili.servertweaks.mechanics.events.*;
 import net.minecraft.server.level.ServerPlayer;
 
 public class Events {
