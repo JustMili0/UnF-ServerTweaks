@@ -1,5 +1,6 @@
 package net.justmili.servertweaks.mechanics.events;
 
+import dev.architectury.event.EventResult;
 import net.justmili.servertweaks.init.Dimensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.Set;
@@ -17,9 +19,9 @@ import java.util.Set;
 public final class Banishment {
     private static final int HOTBAR_SLOT = 4;
 
-    public static boolean onEntityHurt(LivingEntity entity, DamageSource source, float v) {
-        if (!(entity instanceof ServerPlayer player)) return true;
-        return player.level().dimension() != Dimensions.BANISHMENT_WORLD;
+    public static EventResult onEntityHurt(LivingEntity entity, DamageSource source, float v) {
+        if (!(entity instanceof ServerPlayer player)) return EventResult.pass();
+        return EventResult.interrupt(player.level().dimension() != Dimensions.BANISHMENT_WORLD);
     }
 
     public static void onWorldTick(ServerLevel level) {
@@ -53,10 +55,17 @@ public final class Banishment {
     }
 
     public static void onEntityLoad(Entity entity, ServerLevel level) {
+
+
+    }
+
+    public static EventResult onEntityLoad(Entity entity, Level level) {
         //Safeguard 3 - despawn all dropped torch item entities so player can't infinitely dupe them and overload the server
-        if (level.dimension() != Dimensions.BANISHMENT_WORLD) return;
+        if (level.dimension() != Dimensions.BANISHMENT_WORLD) return EventResult.pass();
         if (entity instanceof ItemEntity item && item.getItem().is(Items.TORCH)) {
             entity.discard();
         }
+
+        return EventResult.pass();
     }
 }

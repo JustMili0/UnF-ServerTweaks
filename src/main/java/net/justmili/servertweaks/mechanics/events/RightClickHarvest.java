@@ -1,8 +1,10 @@
 package net.justmili.servertweaks.mechanics.events;
 
+import dev.architectury.event.EventResult;
 import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.mixin.accessors.CropBlockAccessor;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -16,50 +18,55 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
 public final class RightClickHarvest {
 
-    public static InteractionResult onUseBlock(Player player, Level level, InteractionHand hand, BlockHitResult hitResult) {
+    public static InteractionResult onUseBlock(Player player, InteractionHand hand, BlockPos pos, Direction direction) {
+        Level level = player.level();
         if (!Config.rightClickHarvest.get()) return InteractionResult.PASS;
         if (level.isClientSide()) return InteractionResult.PASS;
         if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
         if (player.isSpectator()) return InteractionResult.PASS;
 
-        BlockPos pos = hitResult.getBlockPos();
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();
         boolean hoeHeld = player.getMainHandItem().getItem() instanceof HoeItem;
 
-        if (block instanceof CropBlock cropBlock) {
-            if (!harvestCrop(player, (ServerLevel) level, pos, state, cropBlock)) return InteractionResult.PASS;
-            if (hoeHeld) {
-                for (BlockPos near : BlockPos.betweenClosed(pos.offset(-1, 0, -1), pos.offset(1, 0, 1))) {
-                    if (near.equals(pos)) continue;
-                    BlockState nearState = level.getBlockState(near);
-                    if (nearState.getBlock() instanceof CropBlock nearCrop)
-                        harvestCrop(player, (ServerLevel) level, near.immutable(), nearState, nearCrop);
+        switch (block) {
+            case CropBlock cropBlock -> {
+                if (! harvestCrop(player, (ServerLevel) level, pos, state, cropBlock)) return InteractionResult.PASS;
+                if (hoeHeld) {
+                    for (BlockPos near : BlockPos.betweenClosed(pos.offset(- 1, 0, - 1), pos.offset(1, 0, 1))) {
+                        if (near.equals(pos)) continue;
+                        BlockState nearState = level.getBlockState(near);
+                        if (nearState.getBlock() instanceof CropBlock nearCrop)
+                            harvestCrop(player, (ServerLevel) level, near.immutable(), nearState, nearCrop);
+                    }
                 }
             }
-        } else if (block instanceof NetherWartBlock) {
-            if (!harvestNetherWart(player, (ServerLevel) level, pos, state)) return InteractionResult.PASS;
-            if (hoeHeld) {
-                for (BlockPos near : BlockPos.betweenClosed(pos.offset(-1, 0, -1), pos.offset(1, 0, 1))) {
-                    if (near.equals(pos)) continue;
-                    BlockState nearState = level.getBlockState(near);
-                    if (nearState.getBlock() instanceof NetherWartBlock)
-                        harvestNetherWart(player, (ServerLevel) level, near.immutable(), nearState);
+            case NetherWartBlock netherWartBlock -> {
+                if (! harvestNetherWart(player, (ServerLevel) level, pos, state)) return InteractionResult.PASS;
+                if (hoeHeld) {
+                    for (BlockPos near : BlockPos.betweenClosed(pos.offset(- 1, 0, - 1), pos.offset(1, 0, 1))) {
+                        if (near.equals(pos)) continue;
+                        BlockState nearState = level.getBlockState(near);
+                        if (nearState.getBlock() instanceof NetherWartBlock)
+                            harvestNetherWart(player, (ServerLevel) level, near.immutable(), nearState);
+                    }
                 }
             }
-        } else if (block instanceof CocoaBlock) {
-            if (!harvestCocoa(player, (ServerLevel) level, pos, state)) return InteractionResult.PASS;
-        } else if (block instanceof SugarCaneBlock) {
-            return harvestSugarCane(player, (ServerLevel) level, pos);
-        } else {
-            return InteractionResult.PASS;
+            case CocoaBlock cocoaBlock -> {
+                if (! harvestCocoa(player, (ServerLevel) level, pos, state)) return InteractionResult.PASS;
+            }
+            case SugarCaneBlock sugarCaneBlock -> {
+                return harvestSugarCane(player, (ServerLevel) level, pos);
+            }
+            default -> {
+                return InteractionResult.PASS;
+            }
         }
 
         player.swing(InteractionHand.MAIN_HAND, true);
