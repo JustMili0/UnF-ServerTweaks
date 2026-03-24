@@ -7,13 +7,6 @@
     "BetterPushLimit",
     "RemoveAnvilLimit",
     "UncapSpeedLimits",
-    "abilities.IronGolemMixin",
-    "abilities.ItemUseMixin",
-    "abilities.LivingEntityMixin",
-    "abilities.MobMixin",
-    "abilities.PlayerMixin",
-    "abilities.TamableAnimalMixin",
-    "abilities.VillagerMixin",
     "accessors.CropBlockAccessor"
   ],
   "client": [

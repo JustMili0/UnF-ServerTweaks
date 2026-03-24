@@ -17,6 +17,10 @@ repositories {
         name = "Ladysnake Mods"
         url = "https://maven.ladysnake.org/releases"
     }
+    maven {
+        name = "Modrinth"
+        url = uri("https://api.modrinth.com/maven")
+    }
 }
 
 dependencies {
@@ -30,6 +34,8 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.5.0")))
+
+    modImplementation "maven.modrinth:architectury-api:19.0.1+fabric"
 }
 
 processResources {
