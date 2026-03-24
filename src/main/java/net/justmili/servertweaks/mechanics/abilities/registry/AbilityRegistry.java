@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.mechanics.abilities;
+package net.justmili.servertweaks.mechanics.abilities.registry;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -10,7 +10,7 @@ import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Phantom;
 import net.minecraft.world.entity.monster.piglin.Piglin;
-import net.minecraft.world.entity.npc.villager.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,51 +21,45 @@ import java.util.List;
 import java.util.Map;
 
 public final class AbilityRegistry {
-
     private static final Map<String, Ability> BY_NAME = new HashMap<>();
 
-    // --- Plain abilities (handled via mixins/events) ---
-
-    public static final Ability BURNS_IN_DAYLIGHT  = register(new BurnsInDaylight());
-    public static final Ability FIRE_IMMUNE        = register(new Ability("FIRE_IMMUNE"));
-    public static final Ability FREEZE_IMMUNE      = register(new Ability("FREEZE_IMMUNE"));
-    public static final Ability FALL_IMMUNE        = register(new Ability("FALL_IMMUNE"));
-    public static final Ability CLIMBS_WALLS       = register(new Ability("CLIMBS_WALLS"));
-    public static final Ability SPEED_IN_WATER     = register(new SpeedInWater());
-    public static final Ability BREATHES_UNDERWATER= register(new Ability("BREATHES_UNDERWATER"));
-    public static final Ability NO_KNOCKBACK       = register(new Ability("NO_KNOCKBACK"));
-    public static final Ability STRONG             = register(new Strong());
-    public static final Ability HUNTED_BY_FOX      = register(new HuntedByFox());
-    public static final Ability HUNTED_BY_WOLF     = register(new HuntedByWolf());
-    public static final Ability SCARES_CREEPERS    = register(new ScaresCreepers());
-    public static final Ability SCARES_PHANTOMS    = register(new ScaresPhantoms());
-    public static final Ability FEARED_BY_PIGLINS  = register(new FearedByPiglins());
-    public static final Ability NIGHT_VISION       = register(new NightVision());
-    public static final Ability HATES_WATER        = register(new HatesWater());
-    public static final Ability ATTRACTS_BEES      = register(new AttractsBees());
-    public static final Ability FRIENDS_WITH_NATURE= register(new Ability("FRIENDS_WITH_NATURE"));
-    public static final Ability IS_MONSTER         = register(new IsMonster());
-    public static final Ability JUMP_BOOST         = register(new JumpBoost());
-    public static final Ability CARNIVORE          = register(new Ability("CARNIVORE"));
-    public static final Ability VEGETARIAN         = register(new Ability("VEGETARIAN"));
-    public static final Ability ONLY_EATS_SWEETS   = register(new Ability("ONLY_EATS_SWEETS"));
-    public static final Ability CAN_FEED_FROM_GRASS= register(new Ability("CAN_FEED_FROM_GRASS"));
+    public static final Ability BURNS_IN_DAYLIGHT = register(new BurnsInDaylight());
+    public static final Ability FIRE_IMMUNE = register(new Ability("FIRE_IMMUNE"));
+    public static final Ability FREEZE_IMMUNE = register(new Ability("FREEZE_IMMUNE"));
+    public static final Ability FALL_IMMUNE = register(new Ability("FALL_IMMUNE"));
+    public static final Ability CLIMBS_WALLS = register(new Ability("CLIMBS_WALLS"));
+    public static final Ability SPEED_IN_WATER = register(new SpeedInWater());
+    public static final Ability BREATHES_UNDERWATER = register(new Ability("BREATHES_UNDERWATER"));
+    public static final Ability NO_KNOCKBACK = register(new Ability("NO_KNOCKBACK"));
+    public static final Ability STRONG = register(new Strong());
+    public static final Ability HUNTED_BY_FOX = register(new HuntedByFox());
+    public static final Ability HUNTED_BY_WOLF = register(new HuntedByWolf());
+    public static final Ability SCARES_CREEPERS = register(new ScaresCreepers());
+    public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());
+    public static final Ability FEARED_BY_PIGLINS = register(new FearedByPiglins());
+    public static final Ability NIGHT_VISION = register(new NightVision());
+    public static final Ability HATES_WATER = register(new HatesWater());
+    public static final Ability ATTRACTS_BEES = register(new AttractsBees());
+    public static final Ability FRIENDS_WITH_NATURE = register(new Ability("FRIENDS_WITH_NATURE"));
+    public static final Ability IS_MONSTER = register(new IsMonster());
+    public static final Ability JUMP_BOOST = register(new JumpBoost());
+    public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));
+    public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));
+    public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS"));
+    public static final Ability CAN_FEED_FROM_GRASS = register(new Ability("CAN_FEED_FROM_GRASS"));
 
     private static <T extends Ability> T register(T ability) {
         BY_NAME.put(ability.getName(), ability);
         return ability;
     }
-
     public static Ability byName(String name) {
         return BY_NAME.get(name);
     }
-
     public static Collection<Ability> all() {
         return BY_NAME.values();
     }
 
-    // --- Ticking ability inner classes ---
-
+    // Registered ticking abilities
     static class BurnsInDaylight extends TickingAbility {
         BurnsInDaylight() { super("BURNS_IN_DAYLIGHT"); }
 
@@ -233,8 +227,8 @@ public final class AbilityRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
-            List<AbstractVillager> nearby = level.getEntitiesOfClass(AbstractVillager.class, player.getBoundingBox().inflate(8.0));
-            for (AbstractVillager villager : nearby) {
+            List<Villager> nearby = level.getEntitiesOfClass(Villager.class, player.getBoundingBox().inflate(8.0));
+            for (Villager villager : nearby) {
                 villager.getNavigation().moveTo(
                     villager.getX() + (villager.getX() - player.getX()),
                     villager.getY(),

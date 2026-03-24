@@ -1,7 +1,7 @@
-package net.justmili.servertweaks.mechanics.abilities.sets;
+package net.justmili.servertweaks.mechanics.abilities;
 
-import net.justmili.servertweaks.mechanics.abilities.Ability;
-import net.justmili.servertweaks.mechanics.abilities.AbilityRegistry;
+import net.justmili.servertweaks.mechanics.abilities.registry.Ability;
+import net.justmili.servertweaks.mechanics.abilities.registry.AbilityRegistry;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 

@@ -1,7 +1,8 @@
 package net.justmili.servertweaks.mechanics.abilities;
 
-import net.justmili.servertweaks.mechanics.abilities.sets.AbilityModifiers;
-import net.justmili.servertweaks.mechanics.abilities.sets.FoodCategories;
+import net.justmili.servertweaks.mechanics.abilities.registry.Ability;
+import net.justmili.servertweaks.mechanics.abilities.registry.AbilityRegistry;
+import net.justmili.servertweaks.mechanics.abilities.registry.TickingAbility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;

@@ -1,7 +1,7 @@
 package net.justmili.servertweaks.mixin.abilities;
 
 import net.justmili.servertweaks.mechanics.abilities.AbilityManager;
-import net.justmili.servertweaks.mechanics.abilities.AbilityRegistry;
+import net.justmili.servertweaks.mechanics.abilities.registry.AbilityRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.gossip.GossipType;

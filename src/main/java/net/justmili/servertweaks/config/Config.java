@@ -34,7 +34,7 @@ public class Config {
     public static final Supplier<Boolean> playerAbilities;
     
     static {
-        IConfigBuilder builder = ConfigBuilders.newTomlConfig("servertweaks", null, true);
+        IConfigBuilder builder = ConfigBuilders.newTomlConfig("servertweaks", "", true);
 
         builder.push("Commands");
         builder.comment("Should these commands be enabled on the server?");

@@ -12,11 +12,14 @@
   - Yes fortune applies
   - Larger affect area when using a hoe
 - Special Player Abilities (EXPERIMENTAL, IN TESTING)
+  - REQUIRES ARCHITECTURY API TO BE INSTALLED (WIP)
   - All abilities based on Minecraft mobs
   - Can be configured to be disabled
   - Player abilities can only be given by editing `player_abilities.json` file in `\config\servertweaks\` FOR NOW
     - A proper config add/remove for player abilities will be added once testing and experiments will be done
 
 TODO:
+- Make player abilities use Architectury API, without it, it just won't try doing anything
+  - Fix diet restrictions
 - Make everything dependent on config
 - TEST EVERYTHING

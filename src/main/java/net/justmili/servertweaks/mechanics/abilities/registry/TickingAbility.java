@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.mechanics.abilities;
+package net.justmili.servertweaks.mechanics.abilities.registry;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

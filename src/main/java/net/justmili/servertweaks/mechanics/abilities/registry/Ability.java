@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.mechanics.abilities;
+package net.justmili.servertweaks.mechanics.abilities.registry;
 
 import java.util.Objects;
 

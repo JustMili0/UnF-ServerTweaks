@@ -1,18 +1,19 @@
 package net.justmili.servertweaks.mechanics.abilities;
 
+import com.google.gson.*;
 import net.justmili.servertweaks.ServerTweaks;
-import net.justmili.servertweaks.mechanics.abilities.sets.AbilityModifiers;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
+import net.justmili.servertweaks.mechanics.abilities.registry.Ability;
+import net.justmili.servertweaks.mechanics.abilities.registry.AbilityRegistry;
 import net.minecraft.server.MinecraftServer;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public final class AbilityManager {
 
-    private static final String FILE_NAME = "servertweaks_abilities_config.dat";
+    private static final String FILE_NAME = "player_abilities.json";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private static final Map<UUID, Set<Ability>> playerAbilities = new HashMap<>();
     private static final Map<UUID, Set<AbilityModifiers>> playerModifiers = new HashMap<>();
@@ -45,85 +46,96 @@ public final class AbilityManager {
         playerAbilities.clear();
         playerModifiers.clear();
 
-        File file = getFile(server);
+        File file = getFile();
         if (!file.exists()) {
             playerAbilities.putAll(HARDCODED_ABILITIES);
             playerModifiers.putAll(HARDCODED_MODIFIERS);
-            ServerTweaks.LOGGER.info("[AbilityManager] No .dat file found, using hardcoded defaults.");
+            ServerTweaks.LOGGER.info("[AbilityManager] No config found, using hardcoded defaults.");
+            save(server); // Write the hardcoded entries so the file gets created
             return;
         }
 
-        try {
-            CompoundTag root = NbtIo.read(file.toPath());
+        try (Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
+            JsonObject root = GSON.fromJson(reader, JsonObject.class);
             if (root == null) return;
 
-            for (String key : root.keySet()) {
-                CompoundTag playerTag = root.getCompound(key).orElse(null);
-                if (playerTag == null) continue;
-                String uuidStr = playerTag.getString("UUID").orElse(null);
-                if (uuidStr == null) continue;
-                UUID uuid = UUID.fromString(uuidStr);
+            for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
+                UUID uuid = UUID.fromString(entry.getKey());
+                JsonObject playerObj = entry.getValue().getAsJsonObject();
 
-                CompoundTag abilitiesTag = playerTag.getCompound("abilities").orElseGet(CompoundTag::new);
                 Set<Ability> abilities = new HashSet<>();
-                for (String abilityName : abilitiesTag.keySet()) {
-                    if (!abilitiesTag.getBooleanOr(abilityName, false)) continue;
-                    Ability ability = AbilityRegistry.byName(abilityName);
-                    if (ability != null) abilities.add(ability);
+                if (playerObj.has("abilities")) {
+                    for (JsonElement el : playerObj.getAsJsonArray("abilities")) {
+                        Ability ability = AbilityRegistry.byName(el.getAsString());
+                        if (ability != null) abilities.add(ability);
+                        else ServerTweaks.LOGGER.warn("[AbilityManager] Unknown ability '{}' for {}", el.getAsString(), uuid);
+                    }
                 }
                 playerAbilities.put(uuid, abilities);
 
-                CompoundTag modifiersTag = playerTag.getCompound("modifiers").orElseGet(CompoundTag::new);
                 Set<AbilityModifiers> modifiers = EnumSet.noneOf(AbilityModifiers.class);
-                for (AbilityModifiers modifier : AbilityModifiers.values()) {
-                    if (modifiersTag.getBooleanOr(modifier.name(), false)) modifiers.add(modifier);
+                if (playerObj.has("ability_modifiers")) {
+                    for (JsonElement el : playerObj.getAsJsonArray("ability_modifiers")) {
+                        try {
+                            modifiers.add(AbilityModifiers.valueOf(el.getAsString()));
+                        } catch (IllegalArgumentException e) {
+                            ServerTweaks.LOGGER.warn("[AbilityManager] Unknown modifier '{}' for {}", el.getAsString(), uuid);
+                        }
+                    }
                 }
                 playerModifiers.put(uuid, modifiers);
             }
 
+            // Hardcoded entries always override file entries for those UUIDs
             playerAbilities.putAll(HARDCODED_ABILITIES);
             playerModifiers.putAll(HARDCODED_MODIFIERS);
 
             ServerTweaks.LOGGER.info("[AbilityManager] Loaded abilities for {} player(s).", playerAbilities.size());
-        } catch (IOException e) {
-            ServerTweaks.LOGGER.error("[AbilityManager] Failed to load .dat file: {}", e.getMessage());
+        } catch (Exception e) {
+            ServerTweaks.LOGGER.error("[AbilityManager] Failed to load config: {}", e.getMessage());
         }
     }
 
     public static void save(MinecraftServer server) {
-        CompoundTag root = new CompoundTag();
+        JsonObject root = new JsonObject();
 
+        // Collect all UUIDs, merge abilities and modifiers maps
         Set<UUID> allUuids = new HashSet<>(playerAbilities.keySet());
         allUuids.addAll(playerModifiers.keySet());
 
+        // Build a name lookup for UUIDs from hardcoded so the "name" field is accurate
+        Map<UUID, String> names = new HashMap<>();
+        names.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"), "SillyMili");
+        names.put(UUID.fromString("3ca6c9e4-5727-46ea-bf8d-164d681ebe06"), "Zarsai");
+        names.put(UUID.fromString("44c6e9dc-1ffe-4fb4-95e6-f9e95e013b94"), "Flufaye");
+
         for (UUID uuid : allUuids) {
-            CompoundTag playerTag = new CompoundTag();
-            playerTag.putString("UUID", uuid.toString());
+            JsonObject playerObj = new JsonObject();
 
-            CompoundTag abilitiesTag = new CompoundTag();
+            if (names.containsKey(uuid)) playerObj.addProperty("name", names.get(uuid));
+
+            JsonArray abilitiesArr = new JsonArray();
             Set<Ability> abilities = playerAbilities.getOrDefault(uuid, Collections.emptySet());
-            for (Ability ability : abilities) {
-                abilitiesTag.putBoolean(ability.getName(), true);
-            }
-            playerTag.put("abilities", abilitiesTag);
+            abilities.stream().map(Ability::getName).sorted().forEach(abilitiesArr::add);
+            playerObj.add("abilities", abilitiesArr);
 
-            CompoundTag modifiersTag = new CompoundTag();
+            JsonArray modifiersArr = new JsonArray();
             Set<AbilityModifiers> modifiers = playerModifiers.getOrDefault(uuid, Collections.emptySet());
-            for (AbilityModifiers modifier : AbilityModifiers.values()) {
-                modifiersTag.putBoolean(modifier.name(), modifiers.contains(modifier));
-            }
-            playerTag.put("modifiers", modifiersTag);
+            modifiers.stream().map(Enum::name).sorted().forEach(modifiersArr::add);
+            playerObj.add("ability_modifiers", modifiersArr);
 
-            root.put(uuid.toString(), playerTag);
+            root.add(uuid.toString(), playerObj);
         }
 
         try {
-            File file = getFile(server);
+            File file = getFile();
             file.getParentFile().mkdirs();
-            NbtIo.write(root, file.toPath());
+            try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+                GSON.toJson(root, writer);
+            }
             ServerTweaks.LOGGER.info("[AbilityManager] Saved abilities for {} player(s).", allUuids.size());
-        } catch (IOException e) {
-            ServerTweaks.LOGGER.error("[AbilityManager] Failed to save .dat file: {}", e.getMessage());
+        } catch (Exception e) {
+            ServerTweaks.LOGGER.error("[AbilityManager] Failed to save config: {}", e.getMessage());
         }
     }
 
@@ -143,7 +155,7 @@ public final class AbilityManager {
         return getModifiers(uuid).contains(modifier);
     }
 
-    private static File getFile(MinecraftServer server) {
-        return new File(server.getServerDirectory().toFile(), "config/servertweaks/" + FILE_NAME);
+    private static File getFile() {
+        return new File("config/servertweaks/" + FILE_NAME);
     }
 }

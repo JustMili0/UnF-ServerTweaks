@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.mechanics.abilities.sets;
+package net.justmili.servertweaks.mechanics.abilities;
 
 public enum AbilityModifiers {
     // Diet modifiers
