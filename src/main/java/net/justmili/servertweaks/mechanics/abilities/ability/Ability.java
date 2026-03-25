@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.mechanics.abilities.registry;
+package net.justmili.servertweaks.mechanics.abilities.ability;
 
 import java.util.Objects;
 
@@ -16,8 +16,8 @@ public class Ability {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Ability other)) return false;
-        return Objects.equals(name, other.name);
+        if (!(o instanceof Ability ability)) return false;
+        return Objects.equals(name, ability.name);
     }
 
     @Override

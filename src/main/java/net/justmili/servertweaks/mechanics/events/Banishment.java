@@ -9,6 +9,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -24,39 +25,35 @@ public final class Banishment {
         return EventResult.interrupt(player.level().dimension() != Dimensions.BANISHMENT_WORLD);
     }
 
-    public static void onWorldTick(ServerLevel level) {
+    public static void onPlayerTick(Player ticking) {
+        if (!(ticking instanceof ServerPlayer player)) return;
+        ServerLevel level = player.level();
+
         if (level.dimension() != Dimensions.BANISHMENT_WORLD) return;
 
         //Give torch so they can even see
-        for (ServerPlayer player : level.players()) {
-            ItemStack stack = player.getInventory().getItem(HOTBAR_SLOT);
-            if (stack.isEmpty()) {
-                player.getInventory().setItem(HOTBAR_SLOT, new ItemStack(Items.TORCH));
-            }
+        ItemStack stack = player.getInventory().getItem(HOTBAR_SLOT);
+        if (stack.isEmpty()) {
+            player.getInventory().setItem(HOTBAR_SLOT, new ItemStack(Items.TORCH));
+        }
 
-            //Safeguard 2 - Prevent falling into the deep void if the player breaks the bedrock somehow
-            if (player.getY() < -1.0) {
-                int centerX = player.blockPosition().getX();
-                int centerZ = player.blockPosition().getZ();
+        //Safeguard 2 - Prevent falling into the deep void if the player breaks the bedrock somehow
+        if (player.getY() < -1.0) {
+            int centerX = player.blockPosition().getX();
+            int centerZ = player.blockPosition().getZ();
 
-                for (int dx = -2; dx <= 2; dx++) {
-                    for (int dz = -2; dz <= 2; dz++) {
-                        BlockPos pos = new BlockPos(centerX + dx, 0, centerZ + dz);
-                        if (!level.getBlockState(pos).is(Blocks.BEDROCK)) {
-                            level.setBlock(pos, Blocks.BEDROCK.defaultBlockState(), 3);
-                        }
+            for (int dx = -2; dx <= 2; dx++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    BlockPos pos = new BlockPos(centerX + dx, 0, centerZ + dz);
+                    if (!level.getBlockState(pos).is(Blocks.BEDROCK)) {
+                        level.setBlock(pos, Blocks.BEDROCK.defaultBlockState(), 3);
                     }
                 }
-                player.teleportTo(level, player.getX(), 3.0, player.getZ(), Set.of(), player.getYRot(), player.getXRot(), true);
-                player.setDeltaMovement(0.0, 0.0, 0.0);
-                player.fallDistance = 0.0F;
             }
+            player.teleportTo(level, player.getX(), 3.0, player.getZ(), Set.of(), player.getYRot(), player.getXRot(), true);
+            player.setDeltaMovement(0.0, 0.0, 0.0);
+            player.fallDistance = 0.0F;
         }
-    }
-
-    public static void onEntityLoad(Entity entity, ServerLevel level) {
-
-
     }
 
     public static EventResult onEntityLoad(Entity entity, Level level) {
