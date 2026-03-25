@@ -25,6 +25,7 @@ public class AbilitiesRegistry {
     public static final Ability DWARF = register(new Ability("DWARF"));
     public static final Ability TOUGH = register(new Ability("TOUGH"));
     public static final Ability STRONG = register(new Ability("STRONG"));
+    public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE")); // phone edit note: 1.15x damage multiplier
     public static final Ability BREATHS_UNDERWATER = register(new Ability("BREATHS_UNDERWATER"));
     public static final Ability CANT_BREATHE_AIR = register(new Ability("CANT_BREATHE_AIR"));
     public static final Ability HYDROPHOBIC = register(new Ability("HYDROPHOBIC"));
