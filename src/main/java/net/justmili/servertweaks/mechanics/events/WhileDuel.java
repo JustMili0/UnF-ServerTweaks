@@ -7,7 +7,6 @@ import net.justmili.servertweaks.util.CommandUtil;
 import net.justmili.servertweaks.util.FdaApiUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 

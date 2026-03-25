@@ -1,6 +1,5 @@
 package net.justmili.servertweaks.mechanics.events;
 
-import dev.architectury.event.EventResult;
 import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.mixin.accessors.CropBlockAccessor;
 import net.minecraft.core.BlockPos;

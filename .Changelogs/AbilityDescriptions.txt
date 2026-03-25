@@ -1,30 +1,60 @@
-Abilities:
-BURNS_IN_DAYLIGHT - Undead behavior + twist: doesn't burn with a helmet on (no damage to the helmet), isn't set on fire when in water but still receives 0.5F damage every 1.2-2s, wearing a helmet negates all burning. Applies only when level.isBrightOutside()
-FIRE_IMMUNE - Immune to lava and fire damage, is incompatible with BURNS_IN_DAYLIGHT
+BURNS_IN_DAYLIGHT - Undead behavior + twist: doesn't burn with a helmet on (no damage to the helmet),
+                    isn't set on fire when in water but still receives 0.5F damage every 1.5s, wearing a helmet negates all burning.
+                    Only applies when level.isBrightOutside(), level.canSeeSky() and sky light > 8
+
+FIRE_IMMUNE - Immune to fire, lava, magma block and being on fire damage, incompatible with BURNS_IN_DAYLIGHT
+
 FREEZE_IMMUNE - Immune to freezing damage (e.g. powdered snow)
-CLIMBS_WALLS - Spider behavior, can climb any wall but has to be at least 0.5 of a block off ground to start climbing
-AQUA_GRACE - Additional speed in water
-BREATHS_UNDERWATER - Self-explanatory, allows breathing underwater like a fish
+
+CLIMBS_WALLS - Spider behavior, can climb any solid wall but only when at least 0.5 of a block off the ground
+
+AQUA_GRACE - Conduit Power effect while in water (BREATHES_UNDERWATER on steroids)
+
+BREATHES_UNDERWATER - Self-explanatory, allows breathing underwater like a fish
+
 CANT_BREATHE_AIR - Starts drowning on land, again, like a fish
+
 CANT_SWIM - Always sinks in water
-LIGHT - Permanent hidden Slow Falling 1
-SWIFT - Permanent hidden Speed 1
+
+LIGHT - Slow Falling 1 when falling faster than 0.4 blocks/tick (kicks in before fall damage would occur)
+
+SWIFT - Speed 1 while sprinting
+
 HOPPY - Permanent hidden Jump Boost 1
-DWARF - Height always at 0.75 of normal (set to 0.75 if taller than 0.75) or below (can be below if set via custom /scale command), permanent Haste 2 effect
+
+DWARF - Height capped at 0.75 of normal (players already below 0.75 via /scale are unaffected), permanent hidden Haste 2.
+        Note: players with a locked /scale above 0.75 are exempt from the cap
+
 TOUGH - Gives additional knockback resistance, pairs well with STRONG
+
 STRONG - Gives additional 4hp (2 hearts) of attack damage + Scales health with armor (naked = 100hp, full netherite = 40hp)
-WEAK_TO_DAMAGE - 1.25x damage multiplier from everything except fall
+
+WEAK_TO_DAMAGE - Takes 1.25x damage from all sources except fall damage
+
 HUNTED_BY_FOX - Any non-trusting (tamed) foxes will try to attack the player unprovoked within 16 block radius
+
 HUNTED_BY_WOLF - Any untamed wolves will try to attack the player unprovoked within 16 block radius
+
 SCARES_CREEPERS - Cat behavior, scares creepers within a 8 block radius
+
 SCARES_PHANTOMS - Cat behavior, scares phantoms within a 16 block radius
+
 NIGHT_VISION - Can see in the dark, effect only gets applied with 5s duration with everything hidden only when level.isDarkOutside()
+
 HYDROPHOBIC - Takes damage from standing in water, water cauldrons or in rain
-FRIENDS_WITH_NATURE - Overworld-native neutral animals (wolves, bees, spiders during day, dolphins, llamas, tarder llamas, polar bears, pandas) will not aggro if hit if hit in any way & has 100% tame chance when taming mobs
+
+FRIENDS_WITH_NATURE - Overworld-native neutral animals (wolves, bees, spiders during day, dolphins, llamas, trader llamas, polar bears, pandas)
+                      will not aggro if hit if hit in any way & has 100% tame chance when taming mobs
+
 IS_MONSTER - Is attacked by iron golems, pillagers don't attack but all other mobs can still aggro and attack
+
 CARNIVORE - Can only eat meat (+honey (bottles) and milk and other misc that aren't plant foods)
+
 VEGETARIAN - Can only eat plant foods (crops, bread, etc) (+honey (bottles) and milk and other misc)
-ONLY_EATS_SWEETS - Can only consume foods considered sweet such as sweet berries, glow berries, cookies, cake, pumpkin pie, honey bottles, apples (golden and enchanted too), melon slices
+
+ONLY_EATS_SWEETS - Can only consume foods considered sweet such as sweet berries, glow berries, cookies, cake, pumpkin pie, honey bottles,
+                    apples (golden and enchanted too), melon slices
+
 GRASS_EATER - Can consume minecraft:short_grass and minecraft:tall_grass to gain some food points and very little saturation
 
 Ability modifiers:

@@ -4,7 +4,6 @@ import dev.architectury.event.EventResult;
 import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.fdaapi.PlayerAttachments;
 import net.justmili.servertweaks.util.FdaApiUtil;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;

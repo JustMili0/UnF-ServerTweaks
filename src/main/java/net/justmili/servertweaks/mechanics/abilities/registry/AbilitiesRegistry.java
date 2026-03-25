@@ -1,6 +1,7 @@
 package net.justmili.servertweaks.mechanics.abilities.registry;
 
 import net.justmili.servertweaks.config.Config;
+import net.justmili.servertweaks.mechanics.abilities.AbilityManager;
 import net.justmili.servertweaks.mechanics.abilities.ability.Ability;
 import net.justmili.servertweaks.util.ScalerUtil;
 import net.minecraft.core.Holder;
@@ -11,8 +12,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,19 +24,19 @@ public class AbilitiesRegistry {
     // Registry
     private static final Map<String, Ability> REGISTRY = new HashMap<>();
 
-    public static final Ability BURNS_IN_DAYLIGHT = register(new BurnsInDaylight());          // FINISHED
-    public static final Ability FIRE_IMMUNE = register(new Ability("FIRE_IMMUNE"));     // FINISHED
-    public static final Ability FREEZE_IMMUNE = register(new Ability("FREEZE_IMMUNE")); // FINISHED
-    public static final Ability CLIMBS_WALLS = register(new Ability("CLIMBS_WALLS"));   // FINISHED (UNTESTED)
-    public static final Ability AQUA_GRACE = register(new AquaGrace());                       // FINISHED
-    public static final Ability LIGHT = register(new Light());                                // FINISHED (UNTESTED)
-    public static final Ability SWIFT = register(new Swift());                                // FINISHED
-    public static final Ability HOPPY = register(new Hoppy());                                // FINISHED
-    public static final Ability DWARF = register(new Dwarf());                                // FINISHED
-    public static final Ability TOUGH = register(new Ability("TOUGH"));
-    public static final Ability STRONG = register(new Ability("STRONG"));
-    public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE"));
-    public static final Ability BREATHES_UNDERWATER = register(new Ability("BREATHES_UNDERWATER"));
+    public static final Ability BURNS_IN_DAYLIGHT = register(new BurnsInDaylight());                // FINISHED
+    public static final Ability FIRE_IMMUNE = register(new Ability("FIRE_IMMUNE"));           // FINISHED
+    public static final Ability FREEZE_IMMUNE = register(new Ability("FREEZE_IMMUNE"));       // FINISHED
+    public static final Ability CLIMBS_WALLS = register(new Ability("CLIMBS_WALLS"));         // FINISHED (UNTESTED)
+    public static final Ability AQUA_GRACE = register(new AquaGrace());                             // FINISHED
+    public static final Ability LIGHT = register(new Light());                                      // FINISHED (UNTESTED)
+    public static final Ability SWIFT = register(new Swift());                                      // FINISHED
+    public static final Ability HOPPY = register(new Hoppy());                                      // FINISHED
+    public static final Ability DWARF = register(new Dwarf());                                      // FINISHED
+    public static final Ability TOUGH = register(new Ability("TOUGH"));                       // FINISHED (UNTESTED)
+    public static final Ability STRONG = register(new Ability("STRONG"));                     // FINISHED (UNTESTED)
+    public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE"));     // FINISHED (UNTESTED)
+    public static final Ability BREATHES_UNDERWATER = register(new BreathesUnderwater());           // FINISHED
     public static final Ability CANT_BREATHE_AIR = register(new Ability("CANT_BREATHE_AIR"));
     public static final Ability CANT_SWIM = register(new Ability("CANT_SWIM"));
     public static final Ability HYDROPHOBIC = register(new Ability("HYDROPHOBIC"));
@@ -65,7 +66,6 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
-            if (!(Config.playerAbilities.get())) return;
             if (!level.isBrightOutside() || !level.canSeeSky(player.blockPosition())) return;
 
             if ((level.getBrightness(LightLayer.SKY, player.blockPosition()) <= 8)) return;
@@ -88,6 +88,7 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
+            if (!(Config.playerAbilities.get())) return;
             applyEffect(player, MobEffects.CONDUIT_POWER);
         }
     }
@@ -128,6 +129,33 @@ public class AbilitiesRegistry {
             AttributeInstance scale = ScalerUtil.getScale(player);
             if (scale != null && scale.getBaseValue() > 0.75) ScalerUtil.setScale(player, 0.75);
             applyEffect(player, MobEffects.HASTE, 2);
+        }
+    }
+
+    // TOUGH - LivingEntityMixin
+
+    static class Strong extends TickingAbility {
+        Strong() { super("STRONG"); }
+
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
+            if (level.getGameTime() % 5 != 0) return;
+
+            int armor = player.getArmorValue();
+            float maxHp = Math.max(40.0F, Math.min(100.0F, 100.0F - (armor * 3.0F)));
+            player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
+            if (player.getHealth() > maxHp) player.setHealth(maxHp);
+        }
+    }
+
+    // WEAK_TO_DAMAGE - LivingEntityMixin
+
+    static class BreathesUnderwater extends TickingAbility {
+        BreathesUnderwater() { super("BREATHES_UNDERWATER"); }
+
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
+            if (player.isInWater()) applyEffect(player, MobEffects.WATER_BREATHING, 30, 0);
         }
     }
 

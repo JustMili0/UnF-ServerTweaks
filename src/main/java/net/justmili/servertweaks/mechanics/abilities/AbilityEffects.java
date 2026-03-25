@@ -23,11 +23,11 @@ import java.util.UUID;
 public class AbilityEffects {
     public static void registerAbilityEvents() {
         if (!(Config.playerAbilities.get())) return;
-        TickEvent.PLAYER_POST.register(AbilityEffects::onPlayerTick);
-        EntityEvent.LIVING_HURT.register(AbilityEffects::onEntityHurt);
+        TickEvent.PLAYER_POST.register(AbilityEffects::tickTickingAbilities);
+        EntityEvent.LIVING_HURT.register(AbilityEffects::specialDamageImmune);
     }
 
-    public static void onPlayerTick(Player ticking) {
+    private static void tickTickingAbilities(Player ticking) {
         if (!(ticking instanceof ServerPlayer player)) return;
         ServerLevel level = player.level();
         UUID uuid = player.getUUID();
@@ -40,7 +40,7 @@ public class AbilityEffects {
         }
     }
 
-    private static EventResult onEntityHurt(LivingEntity entity, DamageSource source, float v) {
+    private static EventResult specialDamageImmune(LivingEntity entity, DamageSource source, float value) {
         if (!(entity instanceof ServerPlayer player)) return EventResult.pass();
         Set<Ability> abilities = AbilityManager.getAbilities(player.getUUID());
 

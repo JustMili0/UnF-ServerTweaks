@@ -7,8 +7,10 @@
     "BetterPushLimit",
     "RemoveAnvilLimit",
     "UncapSpeedLimits",
+    "abilities.LivingEntityMixin",
     "abilities.PlayerMixin",
-    "accessors.CropBlockAccessor"
+    "accessors.CropBlockAccessor",
+    "accessors.LivingEntityAccessor"
   ],
   "client": [
   ],
