@@ -1,8 +1,7 @@
 package net.justmili.servertweaks.mechanics.abilities.registry;
 
-import net.justmili.servertweaks.config.Config;
-import net.justmili.servertweaks.mechanics.abilities.AbilityManager;
 import net.justmili.servertweaks.mechanics.abilities.ability.Ability;
+import net.justmili.servertweaks.mixin.accessors.FoxAccessor;
 import net.justmili.servertweaks.util.ScalerUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
@@ -10,14 +9,23 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.fox.Fox;
+import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.Phantom;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AbilitiesRegistry {
@@ -34,23 +42,23 @@ public class AbilitiesRegistry {
     public static final Ability HOPPY = register(new Hoppy());                                      // FINISHED
     public static final Ability DWARF = register(new Dwarf());                                      // FINISHED
     public static final Ability TOUGH = register(new Ability("TOUGH"));                       // FINISHED (UNTESTED)
-    public static final Ability STRONG = register(new Ability("STRONG"));                     // FINISHED (UNTESTED)
+    public static final Ability STRONG = register(new Strong());                                    // FINISHED (UNTESTED)
     public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE"));     // FINISHED (UNTESTED)
     public static final Ability BREATHES_UNDERWATER = register(new BreathesUnderwater());           // FINISHED
-    public static final Ability CANT_BREATHE_AIR = register(new Ability("CANT_BREATHE_AIR"));
-    public static final Ability CANT_SWIM = register(new Ability("CANT_SWIM"));
-    public static final Ability HYDROPHOBIC = register(new Ability("HYDROPHOBIC"));
-    public static final Ability NIGHT_VISION = register(new Ability("NIGHT_VISION"));
-    public static final Ability HUNTED_BY_FOX = register(new Ability("HUNTED_BY_FOX"));
-    public static final Ability HUNTED_BY_WOLF = register(new Ability("HUNTED_BY_WOLF"));
-    public static final Ability SCARES_CREEPERS = register(new Ability("SCARES_CREEPERS"));
-    public static final Ability SCARES_PHANTOMS = register(new Ability("SCARES_PHANTOMS"));
-    public static final Ability FRIENDS_WITH_NATURE = register(new Ability("FRIENDS_WITH_NATURE"));
-    public static final Ability IS_MONSTER = register(new Ability("IS_MONSTER"));
-    public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));
-    public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));
-    public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS"));
-    public static final Ability GRASS_EATER = register(new Ability("GRASS_EATER"));
+    public static final Ability CANT_BREATHE_AIR = register(new Ability("CANT_BREATHE_AIR")); // WIP (Missing: all logic)
+    public static final Ability CANT_SWIM = register(new Ability("CANT_SWIM"));               // WIP (Missing: all logic)
+    public static final Ability HYDROPHOBIC = register(new Hydrophobic());                          // FINISHED (UNTESTED)
+    public static final Ability NIGHT_VISION = register(new NightVision());                         // FINISHED
+    public static final Ability HUNTED_BY_FOX = register(new HuntedByFox());                        // FINISHED (UNTESTED)
+    public static final Ability HUNTED_BY_WOLF = register(new HuntedByWolf());                      // FINISHED (UNTESTED)
+    public static final Ability SCARES_CREEPERS = register(new ScaresCreepers());                   // FINISHED
+    public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());                   // FINISHED
+    public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // WIP (Missing: taming mixins)
+    public static final Ability IS_MONSTER = register(new IsMonster());                             // WIP (Missing: Golem attack and pillagers calm mixins)
+    public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // WIP (Missing: all logic in AbilityEffects)
+    public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // WIP (Missing: all logic in AbilityEffects)
+    public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // WIP (Missing: all logic in AbilityEffects)
+    public static final Ability GRASS_EATER = register(new Ability("GRASS_EATER"));           // WIP (Missing: all logic in AbilityEffects)
 
     private static Ability register(Ability ability) {
         REGISTRY.put(ability.getName(), ability);
@@ -88,7 +96,6 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
-            if (!(Config.playerAbilities.get())) return;
             applyEffect(player, MobEffects.CONDUIT_POWER);
         }
     }
@@ -125,7 +132,6 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
-            if (ScalerUtil.wasScaled(player)) return;
             AttributeInstance scale = ScalerUtil.getScale(player);
             if (scale != null && scale.getBaseValue() > 0.75) ScalerUtil.setScale(player, 0.75);
             applyEffect(player, MobEffects.HASTE, 2);
@@ -145,6 +151,8 @@ public class AbilitiesRegistry {
             float maxHp = Math.max(40.0F, Math.min(100.0F, 100.0F - (armor * 3.0F)));
             player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
             if (player.getHealth() > maxHp) player.setHealth(maxHp);
+
+            player.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(4.0F);
         }
     }
 
@@ -159,16 +167,138 @@ public class AbilitiesRegistry {
         }
     }
 
-    // TODO: Figure out what can be done via ticking, do the rest via mixins
+    static class CantBreatheAir extends TickingAbility {
+        CantBreatheAir() { super("CANT_BREATHE_AIR"); }
+
+        @Override public void tick(ServerPlayer player, ServerLevel level) {
+
+        }
+    }
+
+    static class CantSwim extends TickingAbility {
+        CantSwim() { super("CANT_SWIM"); }
+
+        @Override public void tick(ServerPlayer player, ServerLevel level) {
+
+        }
+    }
+
+    static class Hydrophobic extends TickingAbility {
+        Hydrophobic() { super("HYDROPHOBIC"); }
+
+        @Override public void tick(ServerPlayer player, ServerLevel level) {
+            boolean inWaterOrRain = player.isInWater()
+                || (level.isRaining() && level.canSeeSky(player.blockPosition())
+                || level.getBlockState(player.blockPosition()).is(Blocks.WATER_CAULDRON));
+            if (inWaterOrRain && level.getGameTime() % 20 == 0) player.hurt(level.damageSources().drown(), 1.0F);
+        }
+    }
+
+    static class NightVision extends TickingAbility {
+        NightVision() { super("NIGHT_VISION"); }
+
+        @Override public void tick(ServerPlayer player, ServerLevel level) {
+            if (level.isDarkOutside()) applyEffect(player, MobEffects.NIGHT_VISION);
+        }
+    }
+
+    static class HuntedByFox extends TickingAbility {
+        HuntedByFox() { super("HUNTED_BY_FOX"); }
+
+        @Override public void tick(ServerPlayer player, ServerLevel level) {
+            for (Fox fox : getNearby(player, Fox.class, 12.0)) {
+                if (((FoxAccessor) fox).invokeTrusts(player)) continue;
+                if (fox.getTarget() == null) fox.setTarget(player);
+            }
+        }
+    }
+
+    static class HuntedByWolf extends TickingAbility {
+        HuntedByWolf() { super("HUNTED_BY_WOLF"); }
+
+        @Override public void tick(ServerPlayer player, ServerLevel level) {
+            for (Wolf wolf : getNearby(player, Wolf.class, 16.0)) {
+                if (wolf.isTame()) continue;
+                if (wolf.getTarget() == null) wolf.setTarget(player);
+            }
+        }
+    }
+
+    static class ScaresCreepers extends TickingAbility {
+        ScaresCreepers() { super("SCARES_CREEPERS"); }
+
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
+            for (Creeper creeper : getNearby(player, Creeper.class, 8.0)) {
+                creeper.setTarget(null);
+                creeper.getNavigation().moveTo(
+                    creeper.getX() + (creeper.getX() - player.getX()),
+                    creeper.getY(),
+                    creeper.getZ() + (creeper.getZ() - player.getZ()), 1.2);
+            }
+        }
+    }
+
+    static class ScaresPhantoms extends TickingAbility {
+        ScaresPhantoms() { super("SCARES_PHANTOMS"); }
+
+        @Override public void tick(ServerPlayer player, ServerLevel level) {
+            for (Phantom phantom : getNearby(player, Phantom.class, 16.0)) {
+                phantom.setTarget(null);
+                phantom.getNavigation().moveTo(
+                    phantom.getX() + (phantom.getX() - player.getX()),
+                    phantom.getY() + 8,
+                    phantom.getZ() + (phantom.getZ() - player.getZ()), 1.2);
+            }
+        }
+    }
+
+    static class FriendsWithNature extends TickingAbility {
+        FriendsWithNature() { super("FRIENDS_WITH_NATURE"); }
+
+        @Override public void tick(ServerPlayer player, ServerLevel level) {
+            for (Fox fox : getNearby(player, Fox.class, 24.0)) {
+                FoxAccessor accessor = (FoxAccessor) fox;
+                if (accessor.invokeTrusts(player)) continue;
+                accessor.invokeAddTrustedEntity(player);
+            }
+            for (Wolf wolf : getNearby(player, Wolf.class, 24.0)) {
+                if (wolf.getTarget() == player) wolf.setTarget(null);
+            }
+
+            // +Taming mixins
+        }
+    }
+
+    static class IsMonster extends TickingAbility {
+        IsMonster() { super("IS_MONSTER"); }
+
+        @Override public void tick(ServerPlayer player, ServerLevel level) {
+            for (Villager villager : getNearby(player, Villager.class, 16.0)) {
+                villager.getNavigation().moveTo(
+                    villager.getX() + (villager.getX() - player.getX()),
+                    villager.getY(),
+                    villager.getZ() + (villager.getZ() - player.getZ()), 1.2);
+            }
+        }
+    }
+
+    // CARNIVORE - AbilityEffects         (NOT MADE)
+    // VEGETARIAN - AbilityEffects        (NOT MADE)
+    // ONLY_EATS_SWEETS - AbilityEffects  (NOT MADE)
+    // GRASS_EATER - AbilityEffects       (NOT MADE)
 
     // Ticking abilities helper methods
     private static void applyEffect(ServerPlayer player, Holder<@NotNull MobEffect> effects, int duration, int power) {
-        player.addEffect(new MobEffectInstance(effects, duration, power, false, false));
+        player.addEffect(new MobEffectInstance(effects, duration, power, false, false, false));
     }
     private static void applyEffect(ServerPlayer player, Holder<@NotNull MobEffect> effects) {
-        player.addEffect(new MobEffectInstance(effects, 300, 0, false, false));
+        player.addEffect(new MobEffectInstance(effects, 100, 0, false, false, false));
     }
     private static void applyEffect(ServerPlayer player, Holder<@NotNull MobEffect> effects, int power) {
-        player.addEffect(new MobEffectInstance(effects, 300, power, false, false));
+        player.addEffect(new MobEffectInstance(effects, 100, power, false, false, false));
+    }
+    private static <T extends Mob> List<T> getNearby(ServerPlayer player, Class<T> mob, double radius) {
+        return player.level().getEntitiesOfClass(mob, player.getBoundingBox().inflate(radius));
     }
 }

@@ -10,6 +10,7 @@
     "abilities.LivingEntityMixin",
     "abilities.PlayerMixin",
     "accessors.CropBlockAccessor",
+    "accessors.FoxAccessor",
     "accessors.LivingEntityAccessor"
   ],
   "client": [
