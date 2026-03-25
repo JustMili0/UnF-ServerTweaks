@@ -18,9 +18,12 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.fox.Fox;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Phantom;
+import net.minecraft.world.entity.monster.illager.Pillager;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
@@ -56,8 +59,8 @@ public class AbilitiesRegistry {
     public static final Ability HUNTED_BY_WOLF = register(new HuntedByWolf());                      // FINISHED (UNTESTED)
     public static final Ability SCARES_CREEPERS = register(new ScaresCreepers());                   // FINISHED
     public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());                   // FINISHED
-    public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // WIP (Missing: taming mixins)
-    public static final Ability IS_MONSTER = register(new IsMonster());                             // WIP (Missing: Golem attack and pillagers calm mixins)
+    public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // FINISHED (UNTESTED)
+    public static final Ability IS_MONSTER = register(new IsMonster());                             // FINISHED (UNTESTED)
     public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // WIP (Missing: all logic in AbilityEffects)
     public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // WIP (Missing: all logic in AbilityEffects)
     public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // WIP (Missing: all logic in AbilityEffects)
@@ -200,8 +203,8 @@ public class AbilitiesRegistry {
 
         @Override public void tick(ServerPlayer player, ServerLevel level) {
             boolean inWaterOrRain = player.isInWater()
-                || (level.isRaining() && level.canSeeSky(player.blockPosition())
-                || level.getBlockState(player.blockPosition()).is(Blocks.WATER_CAULDRON));
+                || (level.isRaining() && level.canSeeSky(player.blockPosition()))
+                || level.getBlockState(player.blockPosition()).is(Blocks.WATER_CAULDRON);
             if (inWaterOrRain && level.getGameTime() % 20 == 0) player.hurt(level.damageSources().drown(), 1.0F);
         }
     }
@@ -275,7 +278,7 @@ public class AbilitiesRegistry {
                 accessor.invokeAddTrustedEntity(player);
             }
             for (Wolf wolf : getNearby(player, Wolf.class, 24.0)) {
-                if (wolf.getTarget() == player) wolf.setTarget(null);
+                if (!wolf.isTame() && wolf.getTarget() == player) wolf.setTarget(null);
             }
 
             // +Taming mixins
@@ -291,6 +294,15 @@ public class AbilitiesRegistry {
                     villager.getX() + (villager.getX() - player.getX()),
                     villager.getY(),
                     villager.getZ() + (villager.getZ() - player.getZ()), 1.2);
+            }
+            for (IronGolem ironGolem : getNearby(player, IronGolem.class, 16.0)) {
+                if (ironGolem.getTarget() != player) ironGolem.setTarget(player);
+            }
+            for (SnowGolem snowGolem : getNearby(player, SnowGolem.class, 24.0)) {
+                if (snowGolem.getTarget() != player) snowGolem.setTarget(player);
+            }
+            for (Pillager pillager : getNearby(player, Pillager.class, 64.0)) {
+                if (pillager.getTarget() == player) pillager.setTarget(null);
             }
         }
     }
