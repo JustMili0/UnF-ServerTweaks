@@ -1,9 +1,11 @@
 package net.justmili.servertweaks.mechanics.abilities.registry;
 
+import net.justmili.servertweaks.ServerTweaks;
 import net.justmili.servertweaks.mechanics.abilities.ability.Ability;
 import net.justmili.servertweaks.mixin.accessors.FoxAccessor;
 import net.justmili.servertweaks.util.ScalerUtil;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -13,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.fox.Fox;
 import net.minecraft.world.entity.animal.wolf.Wolf;
@@ -141,6 +144,9 @@ public class AbilitiesRegistry {
     // TOUGH - LivingEntityMixin
 
     static class Strong extends TickingAbility {
+        private static final Identifier MODIFY_HP = ServerTweaks.asResource("strong_hp");
+        private static final Identifier MODIFY_ATTACK = ServerTweaks.asResource("strong_attack");
+
         Strong() { super("STRONG"); }
 
         @Override
@@ -148,11 +154,17 @@ public class AbilitiesRegistry {
             if (level.getGameTime() % 5 != 0) return;
 
             int armor = player.getArmorValue();
-            float maxHp = Math.max(40.0F, Math.min(100.0F, 100.0F - (armor * 3.0F)));
-            player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
-            if (player.getHealth() > maxHp) player.setHealth(maxHp);
-
-            player.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(4.0F);
+            float targetHp = Math.max(40.0F, Math.min(100.0F, 100.0F - (armor * 3.0F)));
+            AttributeInstance maxHp = player.getAttribute(Attributes.MAX_HEALTH);
+            if (maxHp != null) {
+                maxHp.removeModifier(MODIFY_HP);
+                maxHp.addTransientModifier(new AttributeModifier(MODIFY_HP, targetHp - 20.0, AttributeModifier.Operation.ADD_VALUE));
+                if (player.getHealth() > player.getMaxHealth()) player.setHealth(player.getMaxHealth());
+            }
+            AttributeInstance attack = player.getAttribute(Attributes.ATTACK_DAMAGE);
+            if (attack != null && attack.getModifier(MODIFY_ATTACK) == null) {
+                attack.addTransientModifier(new AttributeModifier(MODIFY_ATTACK, 3.0, AttributeModifier.Operation.ADD_VALUE));
+            }
         }
     }
 
