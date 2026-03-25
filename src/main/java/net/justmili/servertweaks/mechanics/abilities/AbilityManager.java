@@ -3,16 +3,14 @@ package net.justmili.servertweaks.mechanics.abilities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.justmili.servertweaks.ServerTweaks;
+import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.mechanics.abilities.ability.Ability;
 import net.justmili.servertweaks.mechanics.abilities.ability.AbilityModifier;
 import net.justmili.servertweaks.mechanics.abilities.registry.AbilitiesRegistry;
 import net.justmili.servertweaks.mechanics.abilities.registry.AbilityModifierRegistry;
 import net.minecraft.server.MinecraftServer;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -28,8 +26,8 @@ public class AbilityManager {
     static {
         // Flufaye
         HARDCODED_ABILITIES.put(UUID.fromString("44c6e9dc-1ffe-4fb4-95e6-f9e95e013b94"), new HashSet<>(List.of(
-            AbilitiesRegistry.SCARES_CREEPERS, AbilitiesRegistry.SCARES_PHANTOMS,
-            AbilitiesRegistry.ONLY_EATS_SWEETS, AbilitiesRegistry.FRIENDS_WITH_NATURE)));
+            AbilitiesRegistry.SCARES_CREEPERS, AbilitiesRegistry.SCARES_PHANTOMS, AbilitiesRegistry.ONLY_EATS_SWEETS,
+            AbilitiesRegistry.FRIENDS_WITH_NATURE, AbilitiesRegistry.WEAK_TO_DAMAGE)));
         HARDCODED_MODIFIERS.put(UUID.fromString("44c6e9dc-1ffe-4fb4-95e6-f9e95e013b94"),
             Set.of(AbilityModifierRegistry.ADD_GOLD_FOODS_TO_DIET));
 
@@ -42,7 +40,8 @@ public class AbilityManager {
 
         // SillyMili
         HARDCODED_ABILITIES.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"), new HashSet<>(List.of(
-            AbilitiesRegistry.SCARES_CREEPERS, AbilitiesRegistry.SCARES_PHANTOMS, AbilitiesRegistry.CARNIVORE)));
+            AbilitiesRegistry.SCARES_CREEPERS, AbilitiesRegistry.SCARES_PHANTOMS, AbilitiesRegistry.CARNIVORE,
+            AbilitiesRegistry.CANT_SWIM)));
         HARDCODED_MODIFIERS.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"),
             Set.of(AbilityModifierRegistry.ADD_GOLD_FOODS_TO_DIET));
     }
@@ -50,7 +49,13 @@ public class AbilityManager {
     public static void loadFile(MinecraftServer server) {
         playerAbilities.clear();
         playerModifiers.clear();
+        if (!(Config.playerAbilities.get())) {
+            HARDCODED_ABILITIES.clear();
+            HARDCODED_MODIFIERS.clear();
+            return;
+        }
 
+        // Create file with default hardcoded
         File file = getFile();
         if (!file.exists()) {
             playerAbilities.putAll(HARDCODED_ABILITIES);
@@ -60,7 +65,48 @@ public class AbilityManager {
             return;
         }
 
-        // TODO: Add reader
+        // Fallback if reader fails
+        playerAbilities.putAll(HARDCODED_ABILITIES);
+        playerModifiers.putAll(HARDCODED_MODIFIERS);
+
+        try (Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
+            JsonObject root = GSON.fromJson(reader, JsonObject.class);
+            for (var entry : root.entrySet()) {
+                UUID uuid;
+                try { uuid = UUID.fromString(entry.getKey()); }
+                catch (IllegalArgumentException e) {
+                    ServerTweaks.LOGGER.warn("[AbilityManager] Invalid UUID '{}', skipping.", entry.getKey());
+                    continue;
+                }
+
+                JsonObject object = entry.getValue().getAsJsonObject();
+                Set<Ability> abilities = new LinkedHashSet<>();
+                if (object.has("abilities")) {
+                    for (var element : object.getAsJsonArray("abilities")) {
+                        Ability ability = AbilitiesRegistry.byName(element.getAsString());
+                        if (ability == null) { 
+                            ServerTweaks.LOGGER.warn("[AbilityManager] Unknown ability '{}', skipping.", element.getAsString()); 
+                            continue; 
+                        }
+                        abilities.add(ability);
+                    }
+                }
+                Set<AbilityModifier> modifiers = new LinkedHashSet<>();
+                if (object.has("ability_modifiers")) {
+                    for (var element : object.getAsJsonArray("ability_modifiers")) {
+                        AbilityModifier modifier = AbilityModifierRegistry.byName(element.getAsString());
+                        if (modifier == null) { 
+                            ServerTweaks.LOGGER.warn("[AbilityManager] Unknown modifier '{}', skipping.", element.getAsString()); continue; 
+                        }
+                        modifiers.add(modifier);
+                    }
+                }
+                playerAbilities.put(uuid, abilities);
+                playerModifiers.put(uuid, modifiers);
+            }
+        } catch (Exception e) {
+            ServerTweaks.LOGGER.error("[AbilityManager] Failed to read config: {}", e.getMessage());
+        }
     }
     public static void saveFile(MinecraftServer server) {
         JsonObject root = new JsonObject();

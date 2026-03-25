@@ -8,6 +8,7 @@ import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.ScoreAccess;
 import net.minecraft.world.scores.ScoreHolder;
 import net.minecraft.world.scores.Scoreboard;
+import org.jspecify.annotations.Nullable;
 
 public class ScalerUtil {
 
@@ -36,10 +37,19 @@ public class ScalerUtil {
         if (Double.isNaN(scale) || scale <= 0.0) scale = 1.0;
         scale = Math.max(min, Math.min(max, scale));
 
-        AttributeInstance instance = player.getAttribute(Attributes.SCALE);
-        if (instance != null) {
-            instance.setBaseValue(scale);
+        if (getScale(player) != null) {
+            setScale(player, scale);
             player.refreshDimensions();
         }
+    }
+
+    public static boolean wasScaled(ServerPlayer player) {
+        return FdaApiUtil.getBoolValue(player, PlayerAttachments.SCALE_LOCKED);
+    }
+    public static @Nullable AttributeInstance getScale(ServerPlayer player) {
+        return player.getAttribute(Attributes.SCALE);
+    }
+    public static void setScale(ServerPlayer player, double scale) {
+        getScale(player).setBaseValue(scale);
     }
 }
