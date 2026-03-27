@@ -67,9 +67,9 @@ public class AbilitiesRegistry {
     public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());                   // FINISHED
     public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // FINISHED (UNTESTED)
     public static final Ability IS_MONSTER = register(new IsMonster());                             // FINISHED (UNTESTED)
-    public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // WIP (Working on it)
-    public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // WIP (Working on it)
-    public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // WIP (Working on it)
+    public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // FINISHED (UNTESTED)
+    public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // FINISHED (UNTESTED)
+    public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // FINISHED (UNTESTED)
     public static final Ability GRASS_EATER = register(new Ability("GRASS_EATER"));           // FINISHED (UNTESTED)
 
     private static Ability register(Ability ability) {

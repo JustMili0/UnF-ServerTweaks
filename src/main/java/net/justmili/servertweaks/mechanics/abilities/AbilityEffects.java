@@ -6,10 +6,13 @@ import dev.architectury.event.events.common.InteractionEvent;
 import dev.architectury.event.events.common.TickEvent;
 import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.mechanics.abilities.ability.Ability;
+import net.justmili.servertweaks.mechanics.abilities.ability.DietCategories;
 import net.justmili.servertweaks.mechanics.abilities.registry.AbilitiesRegistry;
+import net.justmili.servertweaks.mechanics.abilities.registry.AbilityModifierRegistry;
 import net.justmili.servertweaks.mechanics.abilities.registry.TickingAbility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -52,25 +55,43 @@ public class AbilityEffects {
         return InteractionResult.SUCCESS;
     }
 
-    private static InteractionResult dietRestrictions(Player interacting, InteractionHand hand) { // Item RC
+    private static InteractionResult dietRestrictions(Player interacting, InteractionHand hand) {
         if (interacting.level().isClientSide()) return InteractionResult.PASS;
         if (!(interacting instanceof ServerPlayer player)) return InteractionResult.PASS;
         if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
 
-        // TODO: Add restriction logic
+        if (isDietBlocked(player, player.getItemInHand(hand))) return InteractionResult.FAIL;
 
         return InteractionResult.PASS;
     }
-
-    private static InteractionResult dietRestrictions(Player interacting, InteractionHand hand, BlockPos pos, Direction direction) { // Block RC
+    private static InteractionResult dietRestrictions(Player interacting, InteractionHand hand, BlockPos pos, Direction direction) {
         if (interacting.level().isClientSide()) return InteractionResult.PASS;
         if (!(interacting instanceof ServerPlayer player)) return InteractionResult.PASS;
         if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
-        ItemStack stack = player.getItemInHand(hand);
 
-        // TODO: Add restriction logic
+        if (isDietBlocked(player, player.getItemInHand(hand))) return InteractionResult.FAIL;
 
         return InteractionResult.PASS;
+    }
+    private static boolean isDietBlocked(ServerPlayer player, ItemStack stack) {
+        if (!stack.has(DataComponents.FOOD)) return false;
+        UUID uuid = player.getUUID();
+        Set<Ability> abilities = AbilityManager.getAbilities(uuid);
+        boolean hasGold = AbilityManager.has(uuid, AbilityModifierRegistry.ADD_GOLD_FOODS_TO_DIET);
+
+        if (abilities.contains(AbilitiesRegistry.CARNIVORE)) {
+            if (hasGold && DietCategories.GOLDEN_FOODS.contains(stack.getItem())) return false;
+            return !DietCategories.CARNIVORE.contains(stack.getItem());
+        }
+        if (abilities.contains(AbilitiesRegistry.VEGETARIAN)) {
+            if (hasGold && DietCategories.GOLDEN_FOODS.contains(stack.getItem())) return false;
+            return !DietCategories.VEGETARIAN.contains(stack.getItem());
+        }
+        if (abilities.contains(AbilitiesRegistry.ONLY_EATS_SWEETS)) {
+            if (hasGold && DietCategories.GOLDEN_FOODS.contains(stack.getItem())) return false;
+            return !DietCategories.SWEET.contains(stack.getItem());
+        }
+        return false;
     }
 
     private static void tickTickingAbilities(Player ticking) {
