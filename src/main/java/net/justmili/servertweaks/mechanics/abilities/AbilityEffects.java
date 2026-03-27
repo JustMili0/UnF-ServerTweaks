@@ -2,6 +2,7 @@ package net.justmili.servertweaks.mechanics.abilities;
 
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.EntityEvent;
+import dev.architectury.event.events.common.InteractionEvent;
 import dev.architectury.event.events.common.TickEvent;
 import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.mechanics.abilities.ability.Ability;
@@ -11,11 +12,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodData;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.Set;
 import java.util.UUID;
@@ -25,6 +31,46 @@ public class AbilityEffects {
         if (!(Config.playerAbilities.get())) return;
         TickEvent.PLAYER_POST.register(AbilityEffects::tickTickingAbilities);
         EntityEvent.LIVING_HURT.register(AbilityEffects::specialDamageImmune);
+        InteractionEvent.RIGHT_CLICK_BLOCK.register(AbilityEffects::grassEater);
+        InteractionEvent.RIGHT_CLICK_BLOCK.register(AbilityEffects::dietRestrictions);
+        InteractionEvent.RIGHT_CLICK_ITEM.register(AbilityEffects::dietRestrictions);
+    }
+
+    private static InteractionResult grassEater(Player interacting, InteractionHand hand, BlockPos pos, Direction direction) { // Block RC
+        if (interacting.level().isClientSide()) return InteractionResult.PASS;
+        if (!(interacting instanceof ServerPlayer player)) return InteractionResult.PASS;
+        if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
+
+        if (!AbilityManager.has(player.getUUID(), AbilitiesRegistry.GRASS_EATER)) return InteractionResult.PASS;
+        if (!player.level().getBlockState(pos).is(Blocks.SHORT_GRASS)) return InteractionResult.PASS;
+
+        player.level().destroyBlock(pos, false);
+        FoodData food = player.getFoodData();
+        food.eat(2, 0.2F);
+        player.swing(InteractionHand.MAIN_HAND, true);
+
+        return InteractionResult.SUCCESS;
+    }
+
+    private static InteractionResult dietRestrictions(Player interacting, InteractionHand hand) { // Item RC
+        if (interacting.level().isClientSide()) return InteractionResult.PASS;
+        if (!(interacting instanceof ServerPlayer player)) return InteractionResult.PASS;
+        if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
+
+        // TODO: Add restriction logic
+
+        return InteractionResult.PASS;
+    }
+
+    private static InteractionResult dietRestrictions(Player interacting, InteractionHand hand, BlockPos pos, Direction direction) { // Block RC
+        if (interacting.level().isClientSide()) return InteractionResult.PASS;
+        if (!(interacting instanceof ServerPlayer player)) return InteractionResult.PASS;
+        if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
+        ItemStack stack = player.getItemInHand(hand);
+
+        // TODO: Add restriction logic
+
+        return InteractionResult.PASS;
     }
 
     private static void tickTickingAbilities(Player ticking) {
@@ -48,6 +94,7 @@ public class AbilityEffects {
             || source.is(DamageTypes.LAVA) || source.is(DamageTypes.HOT_FLOOR)) return EventResult.interruptFalse();
         if (abilities.contains(AbilitiesRegistry.BREATHES_UNDERWATER) && source.is(DamageTypes.DROWN)) return EventResult.interruptFalse();
         if (abilities.contains(AbilitiesRegistry.FREEZE_IMMUNE) && source.is(DamageTypes.FREEZE)) return EventResult.interruptFalse();
+        if (abilities.contains(AbilitiesRegistry.FALL_IMMUNE) && source.is(DamageTypes.FALL)) return EventResult.interruptFalse();
 
         return EventResult.pass();
     }

@@ -11,7 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -35,16 +34,23 @@ import java.util.List;
 import java.util.Map;
 
 public class AbilitiesRegistry {
+    // Extra Ability variables
+    private static final Identifier SLOW_SPEED = ServerTweaks.asResource("slow_speed");
+    private static final Identifier STRONG_HP = ServerTweaks.asResource("strong_health");
+    private static final Identifier STRONG_DAMAGE = ServerTweaks.asResource("strong_damage");
+
     // Registry
     private static final Map<String, Ability> REGISTRY = new HashMap<>();
 
     public static final Ability BURNS_IN_DAYLIGHT = register(new BurnsInDaylight());                // FINISHED
     public static final Ability FIRE_IMMUNE = register(new Ability("FIRE_IMMUNE"));           // FINISHED
     public static final Ability FREEZE_IMMUNE = register(new Ability("FREEZE_IMMUNE"));       // FINISHED
+    public static final Ability FALL_IMMUNE = register(new Ability("FALL_IMMUNE"));           // FINISHED
     public static final Ability CLIMBS_WALLS = register(new Ability("CLIMBS_WALLS"));         // FINISHED (UNTESTED)
     public static final Ability AQUA_GRACE = register(new AquaGrace());                             // FINISHED
     public static final Ability LIGHT = register(new Light());                                      // FINISHED (UNTESTED)
     public static final Ability SWIFT = register(new Swift());                                      // FINISHED
+    public static final Ability SLOW = register(new Slow());                                        // FINISHED (UNTESTED)
     public static final Ability HOPPY = register(new Hoppy());                                      // FINISHED
     public static final Ability DWARF = register(new Dwarf());                                      // FINISHED
     public static final Ability TOUGH = register(new Ability("TOUGH"));                       // FINISHED (UNTESTED)
@@ -61,10 +67,10 @@ public class AbilitiesRegistry {
     public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());                   // FINISHED
     public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // FINISHED (UNTESTED)
     public static final Ability IS_MONSTER = register(new IsMonster());                             // FINISHED (UNTESTED)
-    public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // WIP (Missing: all logic in AbilityEffects)
-    public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // WIP (Missing: all logic in AbilityEffects)
-    public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // WIP (Missing: all logic in AbilityEffects)
-    public static final Ability GRASS_EATER = register(new Ability("GRASS_EATER"));           // WIP (Missing: all logic in AbilityEffects)
+    public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // WIP (Working on it)
+    public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // WIP (Working on it)
+    public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // WIP (Working on it)
+    public static final Ability GRASS_EATER = register(new Ability("GRASS_EATER"));           // FINISHED (UNTESTED)
 
     private static Ability register(Ability ability) {
         REGISTRY.put(ability.getName(), ability);
@@ -124,6 +130,19 @@ public class AbilitiesRegistry {
         }
     }
 
+    static class Slow extends TickingAbility {
+        Slow() { super("SLOW"); }
+
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
+            AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
+
+            if (speed.getModifier(SLOW_SPEED) == null) {
+                speed.addTransientModifier(new AttributeModifier(SLOW_SPEED, -0.47, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+            }
+        }
+    }
+
     static class Hoppy extends TickingAbility {
         Hoppy() { super("HOPPY"); }
 
@@ -147,9 +166,6 @@ public class AbilitiesRegistry {
     // TOUGH - LivingEntityMixin
 
     static class Strong extends TickingAbility {
-        private static final Identifier MODIFY_HP = ServerTweaks.asResource("strong_hp");
-        private static final Identifier MODIFY_ATTACK = ServerTweaks.asResource("strong_attack");
-
         Strong() { super("STRONG"); }
 
         @Override
@@ -160,13 +176,13 @@ public class AbilitiesRegistry {
             float targetHp = Math.max(40.0F, Math.min(100.0F, 100.0F - (armor * 3.0F)));
             AttributeInstance maxHp = player.getAttribute(Attributes.MAX_HEALTH);
             if (maxHp != null) {
-                maxHp.removeModifier(MODIFY_HP);
-                maxHp.addTransientModifier(new AttributeModifier(MODIFY_HP, targetHp - 20.0, AttributeModifier.Operation.ADD_VALUE));
+                maxHp.removeModifier(STRONG_HP);
+                maxHp.addTransientModifier(new AttributeModifier(STRONG_HP, targetHp - 20.0, AttributeModifier.Operation.ADD_VALUE));
                 if (player.getHealth() > player.getMaxHealth()) player.setHealth(player.getMaxHealth());
             }
             AttributeInstance attack = player.getAttribute(Attributes.ATTACK_DAMAGE);
-            if (attack != null && attack.getModifier(MODIFY_ATTACK) == null) {
-                attack.addTransientModifier(new AttributeModifier(MODIFY_ATTACK, 3.0, AttributeModifier.Operation.ADD_VALUE));
+            if (attack != null && attack.getModifier(STRONG_DAMAGE) == null) {
+                attack.addTransientModifier(new AttributeModifier(STRONG_DAMAGE, 3.0, AttributeModifier.Operation.ADD_VALUE));
             }
         }
     }
