@@ -26,6 +26,7 @@ import net.minecraft.world.entity.monster.illager.Pillager;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,8 +58,8 @@ public class AbilitiesRegistry {
     public static final Ability STRONG = register(new Strong());                                    // FINISHED (UNTESTED)
     public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE"));     // FINISHED (UNTESTED)
     public static final Ability BREATHES_UNDERWATER = register(new BreathesUnderwater());           // FINISHED
-    public static final Ability CANT_BREATHE_AIR = register(new Ability("CANT_BREATHE_AIR")); // WIP (Missing: all logic)
-    public static final Ability CANT_SWIM = register(new Ability("CANT_SWIM"));               // WIP (Missing: all logic)
+    public static final Ability CANT_BREATHE_AIR = register(new CantBreatheAir());                  // FINISHED (UNTESTED)
+    public static final Ability CANT_SWIM = register(new Ability("CANT_SWIM"));               // FINISHED (UNTESTED)
     public static final Ability HYDROPHOBIC = register(new Hydrophobic());                          // FINISHED (UNTESTED)
     public static final Ability NIGHT_VISION = register(new NightVision());                         // FINISHED
     public static final Ability HUNTED_BY_FOX = register(new HuntedByFox());                        // FINISHED (UNTESTED)
@@ -108,7 +109,7 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
-            applyEffect(player, MobEffects.CONDUIT_POWER);
+            if (player.isInWater()) applyEffect(player, MobEffects.CONDUIT_POWER);
         }
     }
 
@@ -202,7 +203,18 @@ public class AbilitiesRegistry {
         CantBreatheAir() { super("CANT_BREATHE_AIR"); }
 
         @Override public void tick(ServerPlayer player, ServerLevel level) {
-
+            if (player.isInWater()) {
+                // Restore air when in water
+                if (player.getAirSupply() < player.getMaxAirSupply())
+                    player.setAirSupply(player.getAirSupply() + 4);
+            } else {
+                // Drain air on land
+                player.setAirSupply(player.getAirSupply() - 1);
+                if (player.getAirSupply() <= -20) {
+                    player.setAirSupply(0);
+                    player.hurt(level.damageSources().drown(), 2.0F);
+                }
+            }
         }
     }
 
@@ -210,14 +222,17 @@ public class AbilitiesRegistry {
         CantSwim() { super("CANT_SWIM"); }
 
         @Override public void tick(ServerPlayer player, ServerLevel level) {
-
+            if (!player.isInWater()) return;
+            Vec3 mov = player.getDeltaMovement();
+            if (mov.y > 0) player.setDeltaMovement(mov.x, 0, mov.z);
         }
     }
 
     static class Hydrophobic extends TickingAbility {
         Hydrophobic() { super("HYDROPHOBIC"); }
 
-        @Override public void tick(ServerPlayer player, ServerLevel level) {
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
             boolean inWaterOrRain = player.isInWater()
                 || (level.isRaining() && level.canSeeSky(player.blockPosition()))
                 || level.getBlockState(player.blockPosition()).is(Blocks.WATER_CAULDRON);
@@ -228,7 +243,8 @@ public class AbilitiesRegistry {
     static class NightVision extends TickingAbility {
         NightVision() { super("NIGHT_VISION"); }
 
-        @Override public void tick(ServerPlayer player, ServerLevel level) {
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
             if (level.isDarkOutside()) applyEffect(player, MobEffects.NIGHT_VISION);
         }
     }
@@ -236,7 +252,8 @@ public class AbilitiesRegistry {
     static class HuntedByFox extends TickingAbility {
         HuntedByFox() { super("HUNTED_BY_FOX"); }
 
-        @Override public void tick(ServerPlayer player, ServerLevel level) {
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
             for (Fox fox : getNearby(player, Fox.class, 12.0)) {
                 if (((FoxAccessor) fox).invokeTrusts(player)) continue;
                 if (fox.getTarget() == null) fox.setTarget(player);
@@ -247,7 +264,8 @@ public class AbilitiesRegistry {
     static class HuntedByWolf extends TickingAbility {
         HuntedByWolf() { super("HUNTED_BY_WOLF"); }
 
-        @Override public void tick(ServerPlayer player, ServerLevel level) {
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
             for (Wolf wolf : getNearby(player, Wolf.class, 16.0)) {
                 if (wolf.isTame()) continue;
                 if (wolf.getTarget() == null) wolf.setTarget(player);
@@ -273,7 +291,8 @@ public class AbilitiesRegistry {
     static class ScaresPhantoms extends TickingAbility {
         ScaresPhantoms() { super("SCARES_PHANTOMS"); }
 
-        @Override public void tick(ServerPlayer player, ServerLevel level) {
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
             for (Phantom phantom : getNearby(player, Phantom.class, 16.0)) {
                 phantom.setTarget(null);
                 phantom.getNavigation().moveTo(
@@ -287,7 +306,8 @@ public class AbilitiesRegistry {
     static class FriendsWithNature extends TickingAbility {
         FriendsWithNature() { super("FRIENDS_WITH_NATURE"); }
 
-        @Override public void tick(ServerPlayer player, ServerLevel level) {
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
             for (Fox fox : getNearby(player, Fox.class, 24.0)) {
                 FoxAccessor accessor = (FoxAccessor) fox;
                 if (accessor.invokeTrusts(player)) continue;
@@ -304,7 +324,8 @@ public class AbilitiesRegistry {
     static class IsMonster extends TickingAbility {
         IsMonster() { super("IS_MONSTER"); }
 
-        @Override public void tick(ServerPlayer player, ServerLevel level) {
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
             for (Villager villager : getNearby(player, Villager.class, 16.0)) {
                 villager.getNavigation().moveTo(
                     villager.getX() + (villager.getX() - player.getX()),
