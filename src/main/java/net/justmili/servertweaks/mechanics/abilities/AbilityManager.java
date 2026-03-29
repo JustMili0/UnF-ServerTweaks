@@ -41,7 +41,7 @@ public class AbilityManager {
         // SillyMili
         HARDCODED_ABILITIES.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"), new HashSet<>(List.of(
             AbilitiesRegistry.SCARES_CREEPERS, AbilitiesRegistry.SCARES_PHANTOMS, AbilitiesRegistry.CARNIVORE,
-            AbilitiesRegistry.CANT_SWIM)));
+            AbilitiesRegistry.CANT_SWIM, AbilitiesRegistry.SWIFT)));
         HARDCODED_MODIFIERS.put(UUID.fromString("19c3c783-9359-4311-98bf-79a6d361362d"),
             Set.of(AbilityModifierRegistry.ADD_GOLD_FOODS_TO_DIET));
     }

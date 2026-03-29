@@ -12,12 +12,38 @@
   - Yes fortune applies
   - Larger affect area when using a hoe
 - Special Player Abilities (UNFINISHED)
-  - REQUIRES ARCHITECTURY API TO BE INSTALLED (WIP)
   - All abilities based on Minecraft mobs
   - Can be configured to be disabled
   - Player abilities can only be given by editing `player_abilities.json` file in `\config\servertweaks\` FOR NOW
     - A proper config add/remove for player abilities will be added once testing and experiments will be done
+- Very undeveloped `/fillextras` command because vanilla didn't have what I needed
 
 TODO:
-- Code player abilities
+- Fix damage cancelling in.. everything
+- Fix abilities
 - Fix that weird bug with duel invites
+
+FROM TESTING:
+Doesn't work (no changes get applied to player behavior):
+- FIRE_IMMUNE (no immunity gi
+- FREEZE_IMMUNE
+- FALL_IMMUNE
+- CLIMBS_WALLS
+- WEAK_TO_DAMAGE
+- CANT_SWIM
+
+Do work (works as intended):
+- AQUA_GRACE
+- LIGHT
+- SWIFT
+- SLOW
+- HOPPY
+- DWARF
+- TOUGH
+- STRONG
+- BREATHES_UNDERWATER
+- HYDROPHOBIC
+
+Kinda work (works for the most part)
+- BURNS_IN_DAYLIGHT - Player doesn't take burning damage without a helmet in water (to fix, should take tiny bit of damage in water if they don't have a helmet)
+- CANT_BREATHE_AIR - Bubbles appear when on land but can't deplete (to fix), already allowed to breathe underwater even when submerged only one block deep (though I think we'll leave that one)

@@ -1,4 +1,4 @@
-package net.justmili.servertweaks.mixin.abilities.context;
+package net.justmili.servertweaks.mechanics.abilities.context;
 
 import net.minecraft.world.entity.player.Player;
 import org.jspecify.annotations.Nullable;

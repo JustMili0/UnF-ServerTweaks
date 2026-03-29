@@ -32,8 +32,8 @@ public class LivingEntityMixin {
     private void onActuallyHurt(ServerLevel level, DamageSource source, float amount, CallbackInfo ci) {
         if (!(Config.playerAbilities.get())) return;
         if (applyDamageModifyer) return;
-        if (! (((LivingEntity) (Object) this) instanceof ServerPlayer player)) return;
-        if (! AbilityManager.has(player.getUUID(), AbilitiesRegistry.WEAK_TO_DAMAGE)) return;
+        if (!(((LivingEntity) (Object) this) instanceof ServerPlayer player)) return;
+        if (!AbilityManager.has(player.getUUID(), AbilitiesRegistry.WEAK_TO_DAMAGE)) return;
         if (source.is(DamageTypes.FALL)) return;
 
         applyDamageModifyer = true;

@@ -43,35 +43,35 @@ public class AbilitiesRegistry {
     // Registry
     private static final Map<String, Ability> REGISTRY = new HashMap<>();
 
-    public static final Ability BURNS_IN_DAYLIGHT = register(new BurnsInDaylight());                // FINISHED
-    public static final Ability FIRE_IMMUNE = register(new Ability("FIRE_IMMUNE"));           // FINISHED
-    public static final Ability FREEZE_IMMUNE = register(new Ability("FREEZE_IMMUNE"));       // FINISHED
-    public static final Ability FALL_IMMUNE = register(new Ability("FALL_IMMUNE"));           // FINISHED
-    public static final Ability CLIMBS_WALLS = register(new Ability("CLIMBS_WALLS"));         // FINISHED (UNTESTED)
-    public static final Ability AQUA_GRACE = register(new AquaGrace());                             // FINISHED
-    public static final Ability LIGHT = register(new Light());                                      // FINISHED (UNTESTED)
-    public static final Ability SWIFT = register(new Swift());                                      // FINISHED
-    public static final Ability SLOW = register(new Slow());                                        // FINISHED (UNTESTED)
-    public static final Ability HOPPY = register(new Hoppy());                                      // FINISHED
-    public static final Ability DWARF = register(new Dwarf());                                      // FINISHED
-    public static final Ability TOUGH = register(new Ability("TOUGH"));                       // FINISHED (UNTESTED)
-    public static final Ability STRONG = register(new Strong());                                    // FINISHED (UNTESTED)
-    public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE"));     // FINISHED (UNTESTED)
-    public static final Ability BREATHES_UNDERWATER = register(new BreathesUnderwater());           // FINISHED
-    public static final Ability CANT_BREATHE_AIR = register(new CantBreatheAir());                  // FINISHED (UNTESTED)
-    public static final Ability CANT_SWIM = register(new Ability("CANT_SWIM"));               // FINISHED (UNTESTED)
-    public static final Ability HYDROPHOBIC = register(new Hydrophobic());                          // FINISHED (UNTESTED)
-    public static final Ability NIGHT_VISION = register(new NightVision());                         // FINISHED
-    public static final Ability HUNTED_BY_FOX = register(new HuntedByFox());                        // FINISHED (UNTESTED)
-    public static final Ability HUNTED_BY_WOLF = register(new HuntedByWolf());                      // FINISHED (UNTESTED)
-    public static final Ability SCARES_CREEPERS = register(new ScaresCreepers());                   // FINISHED
-    public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());                   // FINISHED
-    public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // FINISHED (UNTESTED)
-    public static final Ability IS_MONSTER = register(new IsMonster());                             // FINISHED (UNTESTED)
-    public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // FINISHED (UNTESTED)
-    public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // FINISHED (UNTESTED)
-    public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // FINISHED (UNTESTED)
-    public static final Ability GRASS_EATER = register(new Ability("GRASS_EATER"));           // FINISHED (UNTESTED)
+    public static final Ability BURNS_IN_DAYLIGHT = register(new BurnsInDaylight());                // KINDA WORKS
+    public static final Ability FIRE_IMMUNE = register(new Ability("FIRE_IMMUNE"));           // DOESN'T WORK
+    public static final Ability FREEZE_IMMUNE = register(new Ability("FREEZE_IMMUNE"));       // DOESN'T WORK
+    public static final Ability FALL_IMMUNE = register(new Ability("FALL_IMMUNE"));           // DOESN'T WORK
+    public static final Ability CLIMBS_WALLS = register(new Ability("CLIMBS_WALLS"));         // DOESN'T WORK
+    public static final Ability AQUA_GRACE = register(new AquaGrace());
+    public static final Ability LIGHT = register(new Light());
+    public static final Ability SWIFT = register(new Swift());
+    public static final Ability SLOW = register(new Slow());
+    public static final Ability HOPPY = register(new Hoppy());
+    public static final Ability DWARF = register(new Dwarf());
+    public static final Ability TOUGH = register(new Ability("TOUGH"));
+    public static final Ability STRONG = register(new Strong());
+    public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE"));     // DOESN'T WORK
+    public static final Ability BREATHES_UNDERWATER = register(new BreathesUnderwater());
+    public static final Ability CANT_BREATHE_AIR = register(new CantBreatheAir());                  // KINDA WORKS
+    public static final Ability CANT_SWIM = register(new Ability("CANT_SWIM"));               // DOESN'T WORK
+    public static final Ability HYDROPHOBIC = register(new Hydrophobic());
+    public static final Ability NIGHT_VISION = register(new NightVision());                         // DIDN'T TEST
+    public static final Ability HUNTED_BY_FOX = register(new HuntedByFox());                        // DIDN'T TEST
+    public static final Ability HUNTED_BY_WOLF = register(new HuntedByWolf());                      // DIDN'T TEST
+    public static final Ability SCARES_CREEPERS = register(new ScaresCreepers());
+    public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());
+    public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // DIDN'T TEST
+    public static final Ability IS_MONSTER = register(new IsMonster());                             // DIDN'T TEST
+    public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // DOESN'T WORK
+    public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // DOESN'T WORK
+    public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // DOESN'T WORK
+    public static final Ability GRASS_EATER = register(new Ability("GRASS_EATER"));           // DIDN'T TEST
 
     private static Ability register(Ability ability) {
         REGISTRY.put(ability.getName(), ability);
@@ -109,7 +109,10 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
-            if (player.isInWater()) applyEffect(player, MobEffects.CONDUIT_POWER);
+            if (player.isInWater()) {
+                applyEffect(player, MobEffects.CONDUIT_POWER);
+                applyEffect(player, MobEffects.DOLPHINS_GRACE);
+            }
         }
     }
 
@@ -160,7 +163,7 @@ public class AbilitiesRegistry {
         public void tick(ServerPlayer player, ServerLevel level) {
             AttributeInstance scale = ScalerUtil.getScale(player);
             if (scale != null && scale.getBaseValue() > 0.75) ScalerUtil.setScale(player, 0.75);
-            applyEffect(player, MobEffects.HASTE, 2);
+            applyEffect(player, MobEffects.HASTE, 1);
         }
     }
 

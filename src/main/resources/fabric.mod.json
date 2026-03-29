@@ -23,7 +23,7 @@
     "fabricloader": ">=${loader_version}",
     "fabric-api": "*",
     "supermartijn642configlib": "*",
-    "architectury": "~19,",
+    "architectury": "*",
     "minecraft": "${minecraft_version}"
   }
 }

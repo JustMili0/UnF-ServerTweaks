@@ -21,6 +21,7 @@ public class Commands {
             if (CommandUtil.checkIfExpected(Config.enableDuelCommand, true))
                 Duel.register(dispatcher, commandBuildContext, environment);
             Discard.register(dispatcher, commandBuildContext, environment); // This command is not configurable.
+            FillExtras.register(dispatcher, commandBuildContext, environment) ; // This command is not configurable.
         });
     }
 }

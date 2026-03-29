@@ -1,7 +1,7 @@
 package net.justmili.servertweaks.mixin.abilities;
 
 import net.justmili.servertweaks.config.Config;
-import net.justmili.servertweaks.mixin.abilities.context.PlayerContext;
+import net.justmili.servertweaks.mechanics.abilities.context.PlayerContext;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Mob;

@@ -1,10 +1,12 @@
 package net.justmili.servertweaks;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.justmili.servertweaks.fdaapi.PlayerAttachments;
 import net.justmili.servertweaks.init.Commands;
 import net.justmili.servertweaks.init.Dimensions;
 import net.justmili.servertweaks.init.Events;
+import net.justmili.servertweaks.mechanics.abilities.AbilityManager;
 import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,6 +22,9 @@ public class ServerTweaks implements ModInitializer {
         Commands.register();
         Dimensions.register();
         Events.register();
+
+        ServerLifecycleEvents.SERVER_STARTED.register(AbilityManager::loadFile);
+        ServerLifecycleEvents.SERVER_STOPPING.register(AbilityManager::saveFile);
     }
 
     public static Identifier asResource(String path) {
