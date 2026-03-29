@@ -24,7 +24,6 @@ public class ServerTweaks implements ModInitializer {
         Events.register();
 
         ServerLifecycleEvents.SERVER_STARTED.register(AbilityManager::loadFile);
-        ServerLifecycleEvents.SERVER_STOPPING.register(AbilityManager::saveFile);
     }
 
     public static Identifier asResource(String path) {

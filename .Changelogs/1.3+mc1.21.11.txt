@@ -25,14 +25,15 @@ TODO:
 
 FROM TESTING:
 Doesn't work (no changes get applied to player behavior):
-- FIRE_IMMUNE (no immunity gi
-- FREEZE_IMMUNE
-- FALL_IMMUNE
-- CLIMBS_WALLS
-- WEAK_TO_DAMAGE
-- CANT_SWIM
+- CLIMBS_WALLS - Nothing happens (can't climb walls)
+- WEAK_TO_DAMAGE - Nothing happens (same damage as normal)
+- CANT_SWIM - Nothing happens (can swim as normal)
+- FRIENDS_WITH_NATURE - Doesn't calm attacked untamed wolves, bees etc, and doesn't even let me tame anything because the game things it's already tamed so it doesn't let me
 
 Do work (works as intended):
+- FIRE_IMMUNE
+- FREEZE_IMMUNE
+- FALL_IMMUNE
 - AQUA_GRACE
 - LIGHT
 - SWIFT
@@ -43,7 +44,16 @@ Do work (works as intended):
 - STRONG
 - BREATHES_UNDERWATER
 - HYDROPHOBIC
+- NIGHT_VISION
+- HUNTED_BY_WOLF
+- SCARES_CREEPERS
+- SCARES_PHANTOMS
+- IS_MONSTER
+- GRASS_EATER
 
 Kinda work (works for the most part)
 - BURNS_IN_DAYLIGHT - Player doesn't take burning damage without a helmet in water (to fix, should take tiny bit of damage in water if they don't have a helmet)
 - CANT_BREATHE_AIR - Bubbles appear when on land but can't deplete (to fix), already allowed to breathe underwater even when submerged only one block deep (though I think we'll leave that one)
+- HUNTED_BY_FOX - Foxes are too scared to approach and attack unless the player is crouching
+
+

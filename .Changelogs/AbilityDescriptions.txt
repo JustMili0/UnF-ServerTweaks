@@ -44,9 +44,9 @@ NIGHT_VISION - Can see in the dark, effect only gets applied with 5s duration wi
 HYDROPHOBIC - Takes damage from standing in water, water cauldrons or in rain
 
 FRIENDS_WITH_NATURE - Overworld-native neutral animals (wolves, bees, spiders during day, dolphins, llamas, trader llamas, polar bears, pandas)
-                      will not aggro if hit if hit in any way & has 100% tame chance when taming mobs
+                      will not aggro if hit in any way & has 100% tame chance when taming mobs
 
-IS_MONSTER - Is attacked by iron golems, pillagers don't attack but all other mobs can still aggro and attack
+IS_MONSTER - Is attacked by iron golems, feared by villagers, pillagers don't attack but all other mobs can still aggro and attack
 
 CARNIVORE - Can only eat meat (+honey (bottles) and milk and other misc that aren't plant foods)
 

@@ -1,6 +1,5 @@
 package net.justmili.servertweaks.mechanics.events;
 
-import dev.architectury.event.EventResult;
 import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.fdaapi.PlayerAttachments;
 import net.justmili.servertweaks.util.FdaApiUtil;
@@ -11,14 +10,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 public class WhileAfk {
-    public static EventResult onEntityHurt(LivingEntity entity, DamageSource source, float v) {
+    public static boolean onEntityHurt(LivingEntity entity, DamageSource source, float v) {
         if (source.getEntity() instanceof ServerPlayer player) {
-            return EventResult.interrupt(!FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK));
+            return !FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK);
         }
         if (entity instanceof ServerPlayer player) {
-            return EventResult.interrupt(!FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK));
+            return !FdaApiUtil.getBoolValue(player, PlayerAttachments.IS_AFK);
         }
-        return EventResult.pass();
+        return true;
     }
 
     public static void onPlayerTick(Player player) {

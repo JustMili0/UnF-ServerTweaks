@@ -44,9 +44,9 @@ public class AbilitiesRegistry {
     private static final Map<String, Ability> REGISTRY = new HashMap<>();
 
     public static final Ability BURNS_IN_DAYLIGHT = register(new BurnsInDaylight());                // KINDA WORKS
-    public static final Ability FIRE_IMMUNE = register(new Ability("FIRE_IMMUNE"));           // DOESN'T WORK
-    public static final Ability FREEZE_IMMUNE = register(new Ability("FREEZE_IMMUNE"));       // DOESN'T WORK
-    public static final Ability FALL_IMMUNE = register(new Ability("FALL_IMMUNE"));           // DOESN'T WORK
+    public static final Ability FIRE_IMMUNE = register(new Ability("FIRE_IMMUNE"));
+    public static final Ability FREEZE_IMMUNE = register(new Ability("FREEZE_IMMUNE"));
+    public static final Ability FALL_IMMUNE = register(new Ability("FALL_IMMUNE"));
     public static final Ability CLIMBS_WALLS = register(new Ability("CLIMBS_WALLS"));         // DOESN'T WORK
     public static final Ability AQUA_GRACE = register(new AquaGrace());
     public static final Ability LIGHT = register(new Light());
@@ -61,17 +61,17 @@ public class AbilitiesRegistry {
     public static final Ability CANT_BREATHE_AIR = register(new CantBreatheAir());                  // KINDA WORKS
     public static final Ability CANT_SWIM = register(new Ability("CANT_SWIM"));               // DOESN'T WORK
     public static final Ability HYDROPHOBIC = register(new Hydrophobic());
-    public static final Ability NIGHT_VISION = register(new NightVision());                         // DIDN'T TEST
-    public static final Ability HUNTED_BY_FOX = register(new HuntedByFox());                        // DIDN'T TEST
-    public static final Ability HUNTED_BY_WOLF = register(new HuntedByWolf());                      // DIDN'T TEST
+    public static final Ability NIGHT_VISION = register(new NightVision());
+    public static final Ability HUNTED_BY_FOX = register(new HuntedByFox());                        // KINDA WORKS
+    public static final Ability HUNTED_BY_WOLF = register(new HuntedByWolf());
     public static final Ability SCARES_CREEPERS = register(new ScaresCreepers());
     public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());
-    public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // DIDN'T TEST
-    public static final Ability IS_MONSTER = register(new IsMonster());                             // DIDN'T TEST
+    public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // VERY DOESN'T WORK
+    public static final Ability IS_MONSTER = register(new IsMonster());
     public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // DOESN'T WORK
     public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // DOESN'T WORK
     public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // DOESN'T WORK
-    public static final Ability GRASS_EATER = register(new Ability("GRASS_EATER"));           // DIDN'T TEST
+    public static final Ability GRASS_EATER = register(new Ability("GRASS_EATER"));
 
     private static Ability register(Ability ability) {
         REGISTRY.put(ability.getName(), ability);
@@ -248,7 +248,7 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
-            if (level.isDarkOutside()) applyEffect(player, MobEffects.NIGHT_VISION);
+            if (level.isDarkOutside()) applyEffect(player, MobEffects.NIGHT_VISION, 320, 0);
         }
     }
 
@@ -257,6 +257,7 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
+            if (!player.gameMode.isSurvival()) return;
             for (Fox fox : getNearby(player, Fox.class, 12.0)) {
                 if (((FoxAccessor) fox).invokeTrusts(player)) continue;
                 if (fox.getTarget() == null) fox.setTarget(player);
@@ -269,6 +270,7 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
+            if (!player.gameMode.isSurvival()) return;
             for (Wolf wolf : getNearby(player, Wolf.class, 16.0)) {
                 if (wolf.isTame()) continue;
                 if (wolf.getTarget() == null) wolf.setTarget(player);
@@ -329,6 +331,7 @@ public class AbilitiesRegistry {
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
+            if (!player.gameMode.isSurvival()) return;
             for (Villager villager : getNearby(player, Villager.class, 16.0)) {
                 villager.getNavigation().moveTo(
                     villager.getX() + (villager.getX() - player.getX()),

@@ -1,9 +1,8 @@
 package net.justmili.servertweaks.mechanics.abilities;
 
-import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.EntityEvent;
 import dev.architectury.event.events.common.InteractionEvent;
 import dev.architectury.event.events.common.TickEvent;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.mechanics.abilities.ability.Ability;
 import net.justmili.servertweaks.mechanics.abilities.ability.DietCategories;
@@ -24,7 +23,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 
 import java.util.Set;
 import java.util.UUID;
@@ -33,10 +31,23 @@ public class AbilityEffects {
     public static void registerAbilityEvents() {
         if (!(Config.playerAbilities.get())) return;
         TickEvent.PLAYER_POST.register(AbilityEffects::tickTickingAbilities);
-        EntityEvent.LIVING_HURT.register(AbilityEffects::specialDamageImmune);
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register(AbilityEffects::specialDamageImmune);
         InteractionEvent.RIGHT_CLICK_BLOCK.register(AbilityEffects::grassEater);
         InteractionEvent.RIGHT_CLICK_BLOCK.register(AbilityEffects::dietRestrictions);
         InteractionEvent.RIGHT_CLICK_ITEM.register(AbilityEffects::dietRestrictions);
+    }
+
+    private static void tickTickingAbilities(Player ticking) {
+        if (!(ticking instanceof ServerPlayer player)) return;
+        ServerLevel level = player.level();
+        UUID uuid = player.getUUID();
+        Set<Ability> abilities = AbilityManager.getAbilities(uuid);
+
+        for (Ability ability : abilities) {
+            if (ability instanceof TickingAbility tickingAbility) {
+                tickingAbility.tick(player, level);
+            }
+        }
     }
 
     private static InteractionResult grassEater(Player interacting, InteractionHand hand, BlockPos pos, Direction direction) { // Block RC
@@ -45,7 +56,7 @@ public class AbilityEffects {
         if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
 
         if (!AbilityManager.has(player.getUUID(), AbilitiesRegistry.GRASS_EATER)) return InteractionResult.PASS;
-        if (!player.level().getBlockState(pos).is(Blocks.SHORT_GRASS)) return InteractionResult.PASS;
+        if (!DietCategories.GRASSY.contains(player.level().getBlockState(pos).getBlock())) return InteractionResult.PASS;
 
         player.level().destroyBlock(pos, false);
         FoodData food = player.getFoodData();
@@ -94,30 +105,17 @@ public class AbilityEffects {
         return false;
     }
 
-    private static void tickTickingAbilities(Player ticking) {
-        if (!(ticking instanceof ServerPlayer player)) return;
-        ServerLevel level = player.level();
-        UUID uuid = player.getUUID();
-        Set<Ability> abilities = AbilityManager.getAbilities(uuid);
-
-        for (Ability ability : abilities) {
-            if (ability instanceof TickingAbility tickingAbility) {
-                tickingAbility.tick(player, level);
-            }
-        }
-    }
-
-    private static EventResult specialDamageImmune(LivingEntity entity, DamageSource source, float value) {
-        if (!(entity instanceof ServerPlayer player)) return EventResult.pass();
+    private static boolean specialDamageImmune(LivingEntity entity, DamageSource source, float value) {
+        if (!(entity instanceof ServerPlayer player)) return true;
         Set<Ability> abilities = AbilityManager.getAbilities(player.getUUID());
 
-        if (abilities.contains(AbilitiesRegistry.FIRE_IMMUNE) && source.is(DamageTypes.IN_FIRE) || source.is(DamageTypes.ON_FIRE)
-            || source.is(DamageTypes.LAVA) || source.is(DamageTypes.HOT_FLOOR)) return EventResult.interruptFalse();
-        if (abilities.contains(AbilitiesRegistry.BREATHES_UNDERWATER) && source.is(DamageTypes.DROWN)) return EventResult.interruptFalse();
-        if (abilities.contains(AbilitiesRegistry.FREEZE_IMMUNE) && source.is(DamageTypes.FREEZE)) return EventResult.interruptFalse();
-        if (abilities.contains(AbilitiesRegistry.FALL_IMMUNE) && source.is(DamageTypes.FALL)) return EventResult.interruptFalse();
+        if (abilities.contains(AbilitiesRegistry.FIRE_IMMUNE) && (source.is(DamageTypes.IN_FIRE) || source.is(DamageTypes.ON_FIRE)
+            || source.is(DamageTypes.LAVA) || source.is(DamageTypes.HOT_FLOOR))) return false;
+        if (abilities.contains(AbilitiesRegistry.BREATHES_UNDERWATER) && source.is(DamageTypes.DROWN)) return false;
+        if (abilities.contains(AbilitiesRegistry.FREEZE_IMMUNE) && source.is(DamageTypes.FREEZE)) return false;
+        if (abilities.contains(AbilitiesRegistry.FALL_IMMUNE) && source.is(DamageTypes.FALL)) return false;
 
-        return EventResult.pass();
+        return true;
     }
 
     public static boolean shouldClimb(ServerPlayer player) {

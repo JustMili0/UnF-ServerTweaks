@@ -20,9 +20,9 @@ import java.util.Set;
 public final class Banishment {
     private static final int HOTBAR_SLOT = 4;
 
-    public static EventResult onEntityHurt(LivingEntity entity, DamageSource source, float v) {
-        if (!(entity instanceof ServerPlayer player)) return EventResult.pass();
-        return EventResult.interrupt(player.level().dimension() != Dimensions.BANISHMENT_WORLD);
+    public static boolean onEntityHurt(LivingEntity entity, DamageSource source, float v) {
+        if (!(entity instanceof ServerPlayer player)) return true;
+        return player.level().dimension() != Dimensions.BANISHMENT_WORLD;
     }
 
     public static void onPlayerTick(Player ticking) {

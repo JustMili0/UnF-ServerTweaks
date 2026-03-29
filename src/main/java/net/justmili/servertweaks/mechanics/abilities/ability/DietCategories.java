@@ -2,6 +2,8 @@ package net.justmili.servertweaks.mechanics.abilities.ability;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.Set;
 
@@ -60,5 +62,14 @@ public class DietCategories {
         Items.GOLDEN_APPLE,
         Items.ENCHANTED_GOLDEN_APPLE,
         Items.GOLDEN_CARROT
+    );
+
+    public static final Set<Block> GRASSY = Set.of(
+        Blocks.SHORT_GRASS,
+        Blocks.TALL_GRASS,
+        Blocks.SHORT_DRY_GRASS,
+        Blocks.TALL_DRY_GRASS,
+        Blocks.BUSH,
+        Blocks.FIREFLY_BUSH
     );
 }

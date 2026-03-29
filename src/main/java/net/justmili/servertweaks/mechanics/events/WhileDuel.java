@@ -11,26 +11,26 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 
 public class WhileDuel {
-    public static EventResult onEntityHurt(LivingEntity entity, DamageSource source, float v) {
+    public static boolean onEntityHurt(LivingEntity entity, DamageSource source, float v) {
         //Only work if duel command is enabled
-        if (!Config.enableDuelCommand.get()) return EventResult.pass();
+        if (!Config.enableDuelCommand.get()) return true;
 
         //Disable PVP in favor of Dueling
-        if (!(source.getEntity() instanceof ServerPlayer duelingWith)) return EventResult.pass();
-        if (!(entity instanceof ServerPlayer dueling)) return EventResult.pass();
+        if (!(source.getEntity() instanceof ServerPlayer duelingWith)) return true;
+        if (!(entity instanceof ServerPlayer dueling)) return true;
 
         //Allow for people in duels to attack eachother
             //Save time of getting hit for "/duel end" timer
         if (FdaApiUtil.getBoolValue(dueling, PlayerAttachments.IN_DUEL)
             && duelingWith.getStringUUID().equals(FdaApiUtil.getStringValue(dueling, PlayerAttachments.DUELING_WITH))) {
             FdaApiUtil.setLongValue(dueling, PlayerAttachments.LAST_HIT_TIME, dueling.level().getGameTime());
-            return EventResult.pass();
+            return true;
         }
         if (FdaApiUtil.getBoolValue(duelingWith, PlayerAttachments.IN_DUEL)
-            && dueling.getStringUUID().equals(FdaApiUtil.getStringValue(duelingWith, PlayerAttachments.DUELING_WITH))) return EventResult.pass();
+            && dueling.getStringUUID().equals(FdaApiUtil.getStringValue(duelingWith, PlayerAttachments.DUELING_WITH))) return true;
 
         //Return false otherwise (depends on config check)
-        return EventResult.interruptFalse();
+        return false;
     }
 
     public static EventResult onPlayerDeath(LivingEntity entity, DamageSource source) {

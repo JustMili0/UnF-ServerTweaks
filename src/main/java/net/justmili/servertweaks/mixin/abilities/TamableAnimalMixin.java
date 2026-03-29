@@ -2,8 +2,8 @@ package net.justmili.servertweaks.mixin.abilities;
 
 import net.justmili.servertweaks.config.Config;
 import net.justmili.servertweaks.mechanics.abilities.AbilityManager;
-import net.justmili.servertweaks.mechanics.abilities.registry.AbilitiesRegistry;
 import net.justmili.servertweaks.mechanics.abilities.context.PlayerContext;
+import net.justmili.servertweaks.mechanics.abilities.registry.AbilitiesRegistry;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
