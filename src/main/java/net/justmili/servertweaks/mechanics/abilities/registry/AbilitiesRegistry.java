@@ -96,6 +96,7 @@ public class AbilitiesRegistry {
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
             if (player.getDeltaMovement().y < -0.4) applyEffect(player, MobEffects.SLOW_FALLING);
+            if (player.onGround()) player.removeEffect(MobEffects.SLOW_FALLING);
         }
     }
 
