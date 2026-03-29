@@ -19,7 +19,6 @@
 - Very undeveloped `/fillextras` command because vanilla didn't have what I needed
 
 TODO:
-- Fix damage cancelling in.. everything
 - Fix abilities
 - Fix that weird bug with duel invites
 
@@ -43,6 +42,7 @@ Do work (works as intended):
 - TOUGH
 - STRONG
 - BREATHES_UNDERWATER
+- CANT_BREATHE_AIR
 - HYDROPHOBIC
 - NIGHT_VISION
 - HUNTED_BY_WOLF
@@ -53,7 +53,6 @@ Do work (works as intended):
 
 Kinda work (works for the most part)
 - BURNS_IN_DAYLIGHT - Player doesn't take burning damage without a helmet in water (to fix, should take tiny bit of damage in water if they don't have a helmet)
-- CANT_BREATHE_AIR - Bubbles appear when on land but can't deplete (to fix), already allowed to breathe underwater even when submerged only one block deep (though I think we'll leave that one)
 - HUNTED_BY_FOX - Foxes are too scared to approach and attack unless the player is crouching
 
 

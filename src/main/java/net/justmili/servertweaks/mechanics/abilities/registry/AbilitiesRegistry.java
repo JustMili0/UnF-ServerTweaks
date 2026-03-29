@@ -59,7 +59,7 @@ public class AbilitiesRegistry {
     public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE"));     // DOESN'T WORK
     public static final Ability BREATHES_UNDERWATER = register(new BreathesUnderwater());
     public static final Ability CANT_BREATHE_AIR = register(new CantBreatheAir());                  // KINDA WORKS
-    public static final Ability CANT_SWIM = register(new Ability("CANT_SWIM"));               // DOESN'T WORK
+    public static final Ability CANT_SWIM = register(new CantSwim());                               // DOESN'T WORK
     public static final Ability HYDROPHOBIC = register(new Hydrophobic());
     public static final Ability NIGHT_VISION = register(new NightVision());
     public static final Ability HUNTED_BY_FOX = register(new HuntedByFox());                        // KINDA WORKS

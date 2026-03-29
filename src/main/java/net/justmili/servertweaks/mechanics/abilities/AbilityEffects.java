@@ -125,7 +125,8 @@ public class AbilityEffects {
         Level level = player.level();
         BlockPos pos = player.blockPosition();
         for (Direction dir : Direction.Plane.HORIZONTAL) {
-            if (level.getBlockState(pos.relative(dir)).isSolid()) return true;
+            BlockPos side = pos.relative(dir);
+            if (level.getBlockState(side).isSolid() || level.getBlockState(side.above()).isSolid()) return true;
         }
         return false;
     }

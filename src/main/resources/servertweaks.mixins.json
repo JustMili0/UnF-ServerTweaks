@@ -9,7 +9,6 @@
     "UncapSpeedLimits",
     "abilities.LivingEntityMixin",
     "abilities.MobMixin",
-    "abilities.PlayerMixin",
     "abilities.TamableAnimalMixin",
     "accessors.CropBlockAccessor",
     "accessors.FoxAccessor",
