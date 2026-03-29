@@ -1,61 +1,42 @@
-BURNS_IN_DAYLIGHT - Undead behavior + twist: doesn't burn with a helmet on (no damage to the helmet),
-                    isn't set on fire when in water but still receives 0.5F damage every 1.5s, wearing a helmet negates all burning.
-                    Only applies when level.isBrightOutside(), level.canSeeSky() and sky light > 8
+FIRE_IMMUNE - Nether Mob-based | Immune to fire, being on fire, lava and magma block damage. Incompatible with BURNS_IN_DAYLIGHT.
+FREEZE_IMMUNE - Custom | Immune to freezing damage (e.g. powdered snow).
+FALL_IMMUNE - Cat-based | Immune to fall damage.
 
-FIRE_IMMUNE - Immune to fire, lava, magma block and being on fire damage, incompatible with BURNS_IN_DAYLIGHT
+LIGHT - Chicken-based | Gains Slow Falling when falling faster than 0.4 blocks/tick, preventing fatal fall damage.
+SWIFT - Custom | Gains Speed 1 while sprinting.
+SLOW - Zombie-based | Permanently slowed to roughly zombie walking speed via movement speed attribute reduction.
+HOPPY - Rabbit-based | Permanent hidden Jump Boost 1.
+DWARF - Custom | Height capped at 0.75 of normal scale. Players already at or below 0.75 via /scale are unaffected. Permanent hidden Haste 2.
 
-FREEZE_IMMUNE - Immune to freezing damage (e.g. powdered snow)
+TOUGH - Iron Golem-based | Immune to knockback.
+STRONG - Custom | +4hp (2 hearts) attack damage. Max health scales inversely with armor: 100hp naked, 40hp at full netherite.
 
-CLIMBS_WALLS - Spider behavior, can climb any solid wall but only when at least 0.5 of a block off the ground
+AQUA_GRACE - Dolphin-based | Gains Conduit Power and Dolphin's Grace while in water.
+BREATHES_UNDERWATER - Fish-based | Breathes underwater indefinitely.
+CANT_BREATHE_AIR - Fish-based | Drowns on land. Air supply drains while out of water and restores while submerged.
+CANT_SWIM - Undead-based | Sinks in water.
+HYDROPHOBIC - Custom | Takes 1 damage per second from standing in water, water cauldrons, or rain.
 
-AQUA_GRACE - Conduit Power effect while in water (BREATHES_UNDERWATER on steroids)
+HUNTED_BY_FOX - Custom | Non-trusting foxes within 12 blocks will target and attack the player unprovoked.
+HUNTED_BY_WOLF - Custom | Untamed wolves within 16 blocks will target and attack the player unprovoked.
 
-BREATHES_UNDERWATER - Self-explanatory, allows breathing underwater like a fish
+SCARES_CREEPERS - Cat-based | Creepers within 8 blocks flee from the player.
+SCARES_PHANTOMS - Cat-based | Phantoms within 16 blocks flee from the player.
 
-CANT_BREATHE_AIR - Starts drowning on land, again, like a fish
+FRIENDS_WITH_NATURE - Custom | Overworld neutral mobs will not aggro the player and tamed pets won't defend against them.
+                               Foxes within 24 blocks auto-trust the player. 100% tame chance when taming animals.
+WEAK_TO_DAMAGE - Custom | Takes 1.25x damage from all sources except fall damage.
+NIGHT_VISION - Custom | Gains hidden Night Vision only during nighttime (level.isDarkOutside()).
 
-CANT_SWIM - Always sinks in water
+BURNS_IN_DAYLIGHT - Undead-based | Burns in direct sunlight (requires sky light > 8 and clear sky view). Helmet negates all burning. In water,
+                                   doesn't ignite but takes 0.5 damage every 1.5s instead. Incompatible with FIRE_IMMUNE.
+IS_MONSTER - Monster-based | Iron golems and snow golems attack the player. Villagers flee. Pillagers ignore the player.
+CLIMBS_WALLS - Spider-based | Can climb any solid wall.
 
-LIGHT - Slow Falling 1 when falling faster than 0.4 blocks/tick (kicks in before fall damage would occur)
-
-SWIFT - Speed 1 while sprinting
-
-HOPPY - Permanent hidden Jump Boost 1
-
-DWARF - Height capped at 0.75 of normal (players already below 0.75 via /scale are unaffected), permanent hidden Haste 2.
-        Note: players with a locked /scale above 0.75 are exempt from the cap
-
-TOUGH - Gives additional knockback resistance, pairs well with STRONG
-
-STRONG - Gives additional 4hp (2 hearts) of attack damage + Scales health with armor (naked = 100hp, full netherite = 40hp)
-
-WEAK_TO_DAMAGE - Takes 1.25x damage from all sources except fall damage
-
-HUNTED_BY_FOX - Any non-trusting (tamed) foxes will try to attack the player unprovoked within 16 block radius
-
-HUNTED_BY_WOLF - Any untamed wolves will try to attack the player unprovoked within 16 block radius
-
-SCARES_CREEPERS - Cat behavior, scares creepers within a 8 block radius
-
-SCARES_PHANTOMS - Cat behavior, scares phantoms within a 16 block radius
-
-NIGHT_VISION - Can see in the dark, effect only gets applied with 5s duration with everything hidden only when level.isDarkOutside()
-
-HYDROPHOBIC - Takes damage from standing in water, water cauldrons or in rain
-
-FRIENDS_WITH_NATURE - Overworld-native neutral animals (wolves, bees, spiders during day, dolphins, llamas, trader llamas, polar bears, pandas)
-                      will not aggro if hit in any way & has 100% tame chance when taming mobs
-
-IS_MONSTER - Is attacked by iron golems, feared by villagers, pillagers don't attack but all other mobs can still aggro and attack
-
-CARNIVORE - Can only eat meat (+honey (bottles) and milk and other misc that aren't plant foods)
-
-VEGETARIAN - Can only eat plant foods (crops, bread, etc) (+honey (bottles) and milk and other misc)
-
-ONLY_EATS_SWEETS - Can only consume foods considered sweet such as sweet berries, glow berries, cookies, cake, pumpkin pie, honey bottles,
-                    apples (golden and enchanted too), melon slices
-
-GRASS_EATER - Can consume minecraft:short_grass and minecraft:tall_grass to gain some food points and very little saturation
+CARNIVORE - Wild Animal-based | Can only eat meat. Honey bottles, milk and other misc items are always allowed.
+VEGETARIAN - Farm Animal-based | Can only eat plant-based foods. Honey bottles, milk and other misc items are always allowed.
+ONLY_EATS_SWEETS - Custom | Can only eat sweet foods (berries, cookies, cake, pie, honey, apples, melon slices).
+GRASS_EATER - Sheep-based | Can right-click any grass (tall, short, dry) or bush to eat it, gaining 2 hunger and 0.2 saturation. Consumes the block.
 
 Ability modifiers:
-ADD_GOLD_FOODS_TO_DIET - adds Golden Apples, Enchanted Golden Apples and Golden Carrots to any diet restriction
+ADD_GOLD_FOODS_TO_DIET - Adds golden apples, enchanted golden apples and golden carrots to any active diet restriction.

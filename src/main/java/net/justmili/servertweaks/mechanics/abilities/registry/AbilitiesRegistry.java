@@ -35,20 +35,17 @@ import java.util.List;
 import java.util.Map;
 
 public class AbilitiesRegistry {
-    // Extra Ability variables
+    /// Extra Ability variables
     private static final Identifier SLOW_SPEED = ServerTweaks.asResource("slow_speed");
     private static final Identifier STRONG_HP = ServerTweaks.asResource("strong_health");
     private static final Identifier STRONG_DAMAGE = ServerTweaks.asResource("strong_damage");
 
-    // Registry
+    /// Registry
     private static final Map<String, Ability> REGISTRY = new HashMap<>();
 
-    public static final Ability BURNS_IN_DAYLIGHT = register(new BurnsInDaylight());                // KINDA WORKS
     public static final Ability FIRE_IMMUNE = register(new Ability("FIRE_IMMUNE"));
     public static final Ability FREEZE_IMMUNE = register(new Ability("FREEZE_IMMUNE"));
     public static final Ability FALL_IMMUNE = register(new Ability("FALL_IMMUNE"));
-    public static final Ability CLIMBS_WALLS = register(new Ability("CLIMBS_WALLS"));         // DOESN'T WORK
-    public static final Ability AQUA_GRACE = register(new AquaGrace());
     public static final Ability LIGHT = register(new Light());
     public static final Ability SWIFT = register(new Swift());
     public static final Ability SLOW = register(new Slow());
@@ -56,18 +53,21 @@ public class AbilitiesRegistry {
     public static final Ability DWARF = register(new Dwarf());
     public static final Ability TOUGH = register(new Ability("TOUGH"));
     public static final Ability STRONG = register(new Strong());
-    public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE"));     // DOESN'T WORK
+    public static final Ability AQUA_GRACE = register(new AquaGrace());
     public static final Ability BREATHES_UNDERWATER = register(new BreathesUnderwater());
     public static final Ability CANT_BREATHE_AIR = register(new CantBreatheAir());                  // KINDA WORKS
     public static final Ability CANT_SWIM = register(new CantSwim());                               // DOESN'T WORK
     public static final Ability HYDROPHOBIC = register(new Hydrophobic());
-    public static final Ability NIGHT_VISION = register(new NightVision());
     public static final Ability HUNTED_BY_FOX = register(new HuntedByFox());                        // KINDA WORKS
     public static final Ability HUNTED_BY_WOLF = register(new HuntedByWolf());
     public static final Ability SCARES_CREEPERS = register(new ScaresCreepers());
     public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());
     public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // KINDA WORKS
+    public static final Ability WEAK_TO_DAMAGE = register(new Ability("WEAK_TO_DAMAGE"));     // DOESN'T WORK
+    public static final Ability NIGHT_VISION = register(new NightVision());
+    public static final Ability BURNS_IN_DAYLIGHT = register(new BurnsInDaylight());                // KINDA WORKS
     public static final Ability IS_MONSTER = register(new IsMonster());
+    public static final Ability CLIMBS_WALLS = register(new Ability("CLIMBS_WALLS"));         // DOESN'T WORK
     public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // DOESN'T WORK
     public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // DOESN'T WORK
     public static final Ability ONLY_EATS_SWEETS = register(new Ability("ONLY_EATS_SWEETS")); // DOESN'T WORK
@@ -77,47 +77,21 @@ public class AbilitiesRegistry {
         REGISTRY.put(ability.getName(), ability);
         return ability;
     }
+
     public static @Nullable Ability byName(String name) {
         return REGISTRY.get(name);
     }
 
-    // Define ticking abilities
-    static class BurnsInDaylight extends TickingAbility {
-        BurnsInDaylight() { super("BURNS_IN_DAYLIGHT"); }
+    /// Define ticking abilities
 
-        @Override
-        public void tick(ServerPlayer player, ServerLevel level) {
-            if (!level.isBrightOutside() || !level.canSeeSky(player.blockPosition())) return;
-
-            if ((level.getBrightness(LightLayer.SKY, player.blockPosition()) <= 8)) return;
-            boolean hasHelmet = !player.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
-            if (hasHelmet) return;
-            if (player.isInWater()) {
-                if (level.getGameTime() % 30 == 0) player.hurt(level.damageSources().inFire(), 0.5F);
-            } else {
-                player.igniteForSeconds(2);
-            }
-        }
-    }
-
-    // FIRE_IMMUNE - Ticking in AbilityEffects
-    // FREEZE_IMMUNE - Ticking in AbilityEffects
-    // CLIMBS_WALLS - Boolean in AbilityEffects + PlayerMixin
-
-    static class AquaGrace extends TickingAbility {
-        AquaGrace() { super("AQUA_GRACE"); }
-
-        @Override
-        public void tick(ServerPlayer player, ServerLevel level) {
-            if (player.isInWater()) {
-                applyEffect(player, MobEffects.CONDUIT_POWER);
-                applyEffect(player, MobEffects.DOLPHINS_GRACE);
-            }
-        }
-    }
+    // FIRE_IMMUNE - AbilityEffects (ALLOW_DAMAGE)
+    // FREEZE_IMMUNE - AbilityEffects (ALLOW_DAMAGE)
+    // FALL_IMMUNE - AbilityEffects (ALLOW_DAMAGE)
 
     static class Light extends TickingAbility {
-        Light() { super("LIGHT"); }
+        Light() {
+            super("LIGHT");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -126,7 +100,9 @@ public class AbilitiesRegistry {
     }
 
     static class Swift extends TickingAbility {
-        Swift() { super("SWIFT"); }
+        Swift() {
+            super("SWIFT");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -135,20 +111,24 @@ public class AbilitiesRegistry {
     }
 
     static class Slow extends TickingAbility {
-        Slow() { super("SLOW"); }
+        Slow() {
+            super("SLOW");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
             AttributeInstance speed = player.getAttribute(Attributes.MOVEMENT_SPEED);
 
             if (speed.getModifier(SLOW_SPEED) == null) {
-                speed.addTransientModifier(new AttributeModifier(SLOW_SPEED, -0.47, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                speed.addTransientModifier(new AttributeModifier(SLOW_SPEED, - 0.47, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
             }
         }
     }
 
     static class Hoppy extends TickingAbility {
-        Hoppy() { super("HOPPY"); }
+        Hoppy() {
+            super("HOPPY");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -157,7 +137,9 @@ public class AbilitiesRegistry {
     }
 
     static class Dwarf extends TickingAbility {
-        Dwarf() { super("DWARF"); }
+        Dwarf() {
+            super("DWARF");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -167,10 +149,12 @@ public class AbilitiesRegistry {
         }
     }
 
-    // TOUGH - LivingEntityMixin
+    // TOUGH - LivingEntityMixin (knockback)
 
     static class Strong extends TickingAbility {
-        Strong() { super("STRONG"); }
+        Strong() {
+            super("STRONG");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -191,10 +175,25 @@ public class AbilitiesRegistry {
         }
     }
 
-    // WEAK_TO_DAMAGE - LivingEntityMixin
+    static class AquaGrace extends TickingAbility {
+        AquaGrace() {
+            super("AQUA_GRACE");
+        }
 
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
+            if (player.isInWater()) {
+                applyEffect(player, MobEffects.CONDUIT_POWER);
+                applyEffect(player, MobEffects.DOLPHINS_GRACE);
+            }
+        }
+    }
+
+    // BREATHES_UNDERWATER ticking + AbilityEffects (ALLOW_DAMAGE)
     static class BreathesUnderwater extends TickingAbility {
-        BreathesUnderwater() { super("BREATHES_UNDERWATER"); }
+        BreathesUnderwater() {
+            super("BREATHES_UNDERWATER");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -202,10 +201,14 @@ public class AbilitiesRegistry {
         }
     }
 
+    // CANT_BREATHE_AIR ticking + LivingEntityMixin (increaseAirSupply) to block vanilla air restoration on land
     static class CantBreatheAir extends TickingAbility {
-        CantBreatheAir() { super("CANT_BREATHE_AIR"); }
+        CantBreatheAir() {
+            super("CANT_BREATHE_AIR");
+        }
 
-        @Override public void tick(ServerPlayer player, ServerLevel level) {
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
             if (player.isInWater()) {
                 // Restore air when in water
                 if (player.getAirSupply() < player.getMaxAirSupply())
@@ -213,7 +216,7 @@ public class AbilitiesRegistry {
             } else {
                 // Drain air on land
                 player.setAirSupply(player.getAirSupply() - 1);
-                if (player.getAirSupply() <= -20) {
+                if (player.getAirSupply() <= - 20) {
                     player.setAirSupply(0);
                     player.hurt(level.damageSources().drown(), 2.0F);
                 }
@@ -222,9 +225,12 @@ public class AbilitiesRegistry {
     }
 
     static class CantSwim extends TickingAbility {
-        CantSwim() { super("CANT_SWIM"); }
+        CantSwim() {
+            super("CANT_SWIM");
+        }
 
-        @Override public void tick(ServerPlayer player, ServerLevel level) {
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
             if (!player.isInWater()) return;
             Vec3 mov = player.getDeltaMovement();
             if (mov.y > 0) player.setDeltaMovement(mov.x, 0, mov.z);
@@ -232,7 +238,9 @@ public class AbilitiesRegistry {
     }
 
     static class Hydrophobic extends TickingAbility {
-        Hydrophobic() { super("HYDROPHOBIC"); }
+        Hydrophobic() {
+            super("HYDROPHOBIC");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -243,17 +251,10 @@ public class AbilitiesRegistry {
         }
     }
 
-    static class NightVision extends TickingAbility {
-        NightVision() { super("NIGHT_VISION"); }
-
-        @Override
-        public void tick(ServerPlayer player, ServerLevel level) {
-            if (level.isDarkOutside()) applyEffect(player, MobEffects.NIGHT_VISION, 320, 0);
-        }
-    }
-
     static class HuntedByFox extends TickingAbility {
-        HuntedByFox() { super("HUNTED_BY_FOX"); }
+        HuntedByFox() {
+            super("HUNTED_BY_FOX");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -266,7 +267,9 @@ public class AbilitiesRegistry {
     }
 
     static class HuntedByWolf extends TickingAbility {
-        HuntedByWolf() { super("HUNTED_BY_WOLF"); }
+        HuntedByWolf() {
+            super("HUNTED_BY_WOLF");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -279,7 +282,9 @@ public class AbilitiesRegistry {
     }
 
     static class ScaresCreepers extends TickingAbility {
-        ScaresCreepers() { super("SCARES_CREEPERS"); }
+        ScaresCreepers() {
+            super("SCARES_CREEPERS");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -294,7 +299,9 @@ public class AbilitiesRegistry {
     }
 
     static class ScaresPhantoms extends TickingAbility {
-        ScaresPhantoms() { super("SCARES_PHANTOMS"); }
+        ScaresPhantoms() {
+            super("SCARES_PHANTOMS");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -309,7 +316,9 @@ public class AbilitiesRegistry {
     }
 
     static class FriendsWithNature extends TickingAbility {
-        FriendsWithNature() { super("FRIENDS_WITH_NATURE"); }
+        FriendsWithNature() {
+            super("FRIENDS_WITH_NATURE");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -321,13 +330,47 @@ public class AbilitiesRegistry {
             for (Wolf wolf : getNearby(player, Wolf.class, 24.0)) {
                 if (!wolf.isTame() && wolf.getTarget() == player) wolf.setTarget(null);
             }
+            // Aggro prevention - MobMixin (tick) + TargetingConditionsMixin (test)
+            // 100% tame chance - TamableAnimalMixin (tame)
+        }
+    }
 
-            // +Taming mixins
+    // WEAK_TO_DAMAGE - LivingEntityMixin (actuallyHurt)
+
+    static class NightVision extends TickingAbility {
+        NightVision() {
+            super("NIGHT_VISION");
+        }
+
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
+            if (level.isDarkOutside()) applyEffect(player, MobEffects.NIGHT_VISION, 320, 0);
+        }
+    }
+
+    static class BurnsInDaylight extends TickingAbility {
+        BurnsInDaylight() {
+            super("BURNS_IN_DAYLIGHT");
+        }
+
+        @Override
+        public void tick(ServerPlayer player, ServerLevel level) {
+            if (!level.isBrightOutside() || !level.canSeeSky(player.blockPosition())) return;
+            if ((level.getBrightness(LightLayer.SKY, player.blockPosition()) <= 8)) return;
+            boolean hasHelmet = !player.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
+            if (hasHelmet) return;
+            if (player.isInWater()) {
+                if (level.getGameTime() % 30 == 0) player.hurt(level.damageSources().inFire(), 0.5F);
+            } else {
+                player.igniteForSeconds(2);
+            }
         }
     }
 
     static class IsMonster extends TickingAbility {
-        IsMonster() { super("IS_MONSTER"); }
+        IsMonster() {
+            super("IS_MONSTER");
+        }
 
         @Override
         public void tick(ServerPlayer player, ServerLevel level) {
@@ -350,10 +393,12 @@ public class AbilitiesRegistry {
         }
     }
 
-    // CARNIVORE - AbilityEffects
-    // VEGETARIAN - AbilityEffects
-    // ONLY_EATS_SWEETS - AbilityEffects
-    // GRASS_EATER - AbilityEffects
+    // CLIMBS_WALLS - LivingEntityMixin (onClimbable) + AbilityEffects (shouldClimb bool)
+
+    // CARNIVORE - AbilityEffects (RIGHT_CLICK_BLOCK + RIGHT_CLICK_ITEM)
+    // VEGETARIAN - AbilityEffects (RIGHT_CLICK_BLOCK + RIGHT_CLICK_ITEM)
+    // ONLY_EATS_SWEETS - AbilityEffects (RIGHT_CLICK_BLOCK + RIGHT_CLICK_ITEM)
+    // GRASS_EATER - AbilityEffects (RIGHT_CLICK_BLOCK)
 
     // Ticking abilities helper methods
     private static void applyEffect(ServerPlayer player, Holder<@NotNull MobEffect> effects, int duration, int power) {

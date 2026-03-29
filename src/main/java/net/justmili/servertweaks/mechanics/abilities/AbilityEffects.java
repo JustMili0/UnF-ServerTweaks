@@ -50,6 +50,19 @@ public class AbilityEffects {
         }
     }
 
+    private static boolean specialDamageImmune(LivingEntity entity, DamageSource source, float value) {
+        if (!(entity instanceof ServerPlayer player)) return true;
+        Set<Ability> abilities = AbilityManager.getAbilities(player.getUUID());
+
+        if (abilities.contains(AbilitiesRegistry.FIRE_IMMUNE) && (source.is(DamageTypes.IN_FIRE) || source.is(DamageTypes.ON_FIRE)
+            || source.is(DamageTypes.LAVA) || source.is(DamageTypes.HOT_FLOOR))) return false;
+        if (abilities.contains(AbilitiesRegistry.FREEZE_IMMUNE) && source.is(DamageTypes.FREEZE)) return false;
+        if (abilities.contains(AbilitiesRegistry.FALL_IMMUNE) && source.is(DamageTypes.FALL)) return false;
+        if (abilities.contains(AbilitiesRegistry.BREATHES_UNDERWATER) && source.is(DamageTypes.DROWN)) return false;
+
+        return true;
+    }
+
     private static InteractionResult grassEater(Player interacting, InteractionHand hand, BlockPos pos, Direction direction) { // Block RC
         if (interacting.level().isClientSide()) return InteractionResult.PASS;
         if (!(interacting instanceof ServerPlayer player)) return InteractionResult.PASS;
@@ -64,6 +77,19 @@ public class AbilityEffects {
         player.swing(InteractionHand.MAIN_HAND, true);
 
         return InteractionResult.SUCCESS;
+    }
+
+    public static boolean shouldClimb(ServerPlayer player) {
+        if (!(Config.playerAbilities.get())) return false;
+        if (!AbilityManager.has(player.getUUID(), AbilitiesRegistry.CLIMBS_WALLS)) return false;
+        if (player.onGround()) return false;
+        Level level = player.level();
+        BlockPos pos = player.blockPosition();
+        for (Direction dir : Direction.Plane.HORIZONTAL) {
+            BlockPos side = pos.relative(dir);
+            if (level.getBlockState(side).isSolid() || level.getBlockState(side.above()).isSolid()) return true;
+        }
+        return false;
     }
 
     private static InteractionResult dietRestrictions(Player interacting, InteractionHand hand) {
@@ -101,32 +127,6 @@ public class AbilityEffects {
         if (abilities.contains(AbilitiesRegistry.ONLY_EATS_SWEETS)) {
             if (hasGold && DietCategories.GOLDEN_FOODS.contains(stack.getItem())) return false;
             return !DietCategories.SWEET.contains(stack.getItem());
-        }
-        return false;
-    }
-
-    private static boolean specialDamageImmune(LivingEntity entity, DamageSource source, float value) {
-        if (!(entity instanceof ServerPlayer player)) return true;
-        Set<Ability> abilities = AbilityManager.getAbilities(player.getUUID());
-
-        if (abilities.contains(AbilitiesRegistry.FIRE_IMMUNE) && (source.is(DamageTypes.IN_FIRE) || source.is(DamageTypes.ON_FIRE)
-            || source.is(DamageTypes.LAVA) || source.is(DamageTypes.HOT_FLOOR))) return false;
-        if (abilities.contains(AbilitiesRegistry.BREATHES_UNDERWATER) && source.is(DamageTypes.DROWN)) return false;
-        if (abilities.contains(AbilitiesRegistry.FREEZE_IMMUNE) && source.is(DamageTypes.FREEZE)) return false;
-        if (abilities.contains(AbilitiesRegistry.FALL_IMMUNE) && source.is(DamageTypes.FALL)) return false;
-
-        return true;
-    }
-
-    public static boolean shouldClimb(ServerPlayer player) {
-        if (!(Config.playerAbilities.get())) return false;
-        if (!AbilityManager.has(player.getUUID(), AbilitiesRegistry.CLIMBS_WALLS)) return false;
-        if (player.onGround()) return false;
-        Level level = player.level();
-        BlockPos pos = player.blockPosition();
-        for (Direction dir : Direction.Plane.HORIZONTAL) {
-            BlockPos side = pos.relative(dir);
-            if (level.getBlockState(side).isSolid() || level.getBlockState(side.above()).isSolid()) return true;
         }
         return false;
     }

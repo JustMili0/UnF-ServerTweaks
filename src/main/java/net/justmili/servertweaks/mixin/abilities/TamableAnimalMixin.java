@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TamableAnimal.class)
 public class TamableAnimalMixin {
-    // 100% tame chance for FRIENDS_WITH_NATURE
+    // 100% tame chance for FRIENDS_WITH_NATURE (TO FIX)
     @Inject(method = "tame", at = @At("HEAD"), cancellable = true)
     private void servertweaks$tame(Player player, CallbackInfo ci) {
         if (!(Config.playerAbilities.get())) return;
