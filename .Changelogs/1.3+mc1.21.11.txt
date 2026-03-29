@@ -27,7 +27,9 @@ Doesn't work (no changes get applied to player behavior):
 - CLIMBS_WALLS - Nothing happens (can't climb walls)
 - WEAK_TO_DAMAGE - Nothing happens (same damage as normal)
 - CANT_SWIM - Nothing happens (can swim as normal)
-- FRIENDS_WITH_NATURE - Doesn't calm attacked untamed wolves, bees etc, and doesn't even let me tame anything because the game things it's already tamed so it doesn't let me
+- CARNIVORE - Doesn't block foods not in the diet and just allows everything
+- VEGETARIAN - Doesn't block foods not in the diet and just allows everything
+- ONLY_EATS_SWEETS - Doesn't block foods not in the diet and just allows everything
 
 Do work (works as intended):
 - FIRE_IMMUNE
@@ -54,5 +56,6 @@ Do work (works as intended):
 Kinda work (works for the most part)
 - BURNS_IN_DAYLIGHT - Player doesn't take burning damage without a helmet in water (to fix, should take tiny bit of damage in water if they don't have a helmet)
 - HUNTED_BY_FOX - Foxes are too scared to approach and attack unless the player is crouching
+- FRIENDS_WITH_NATURE - Calms down neutral animals such as wolves, bees etc. but the tame roll chance still isn't always-taming
 
 

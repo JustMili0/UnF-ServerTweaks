@@ -66,7 +66,7 @@ public class AbilitiesRegistry {
     public static final Ability HUNTED_BY_WOLF = register(new HuntedByWolf());
     public static final Ability SCARES_CREEPERS = register(new ScaresCreepers());
     public static final Ability SCARES_PHANTOMS = register(new ScaresPhantoms());
-    public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // VERY DOESN'T WORK
+    public static final Ability FRIENDS_WITH_NATURE = register(new FriendsWithNature());            // KINDA WORKS
     public static final Ability IS_MONSTER = register(new IsMonster());
     public static final Ability CARNIVORE = register(new Ability("CARNIVORE"));               // DOESN'T WORK
     public static final Ability VEGETARIAN = register(new Ability("VEGETARIAN"));             // DOESN'T WORK
@@ -350,10 +350,10 @@ public class AbilitiesRegistry {
         }
     }
 
-    // CARNIVORE - AbilityEffects         (NOT MADE)
-    // VEGETARIAN - AbilityEffects        (NOT MADE)
-    // ONLY_EATS_SWEETS - AbilityEffects  (NOT MADE)
-    // GRASS_EATER - AbilityEffects       (NOT MADE)
+    // CARNIVORE - AbilityEffects
+    // VEGETARIAN - AbilityEffects
+    // ONLY_EATS_SWEETS - AbilityEffects
+    // GRASS_EATER - AbilityEffects
 
     // Ticking abilities helper methods
     private static void applyEffect(ServerPlayer player, Holder<@NotNull MobEffect> effects, int duration, int power) {

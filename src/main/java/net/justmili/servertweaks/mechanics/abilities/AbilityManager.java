@@ -1,5 +1,7 @@
 package net.justmili.servertweaks.mechanics.abilities;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.justmili.servertweaks.ServerTweaks;
@@ -14,9 +16,8 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static net.justmili.servertweaks.util.JsonUtil.GSON;
-
 public class AbilityManager {
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String FILE_NAME = "player_abilities.json";
     private static final Map<UUID, Set<Ability>> playerAbilities = new HashMap<>();
     private static final Map<UUID, Set<AbilityModifier>> playerModifiers = new HashMap<>();
